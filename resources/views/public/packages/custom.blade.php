@@ -2,6 +2,14 @@
 
 @section('title', 'Request a Custom Quote')
 
+<!-- === AOS Animation === -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/public/packages/custom.css') }}">
+@endpush
+
 @section('content')
 
 <!-- === HERO SECTION === -->
@@ -48,7 +56,7 @@
 <section id="quoteForm" class="py-5 position-relative" style="background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;">
     <div class="container">
         <div class="row justify-content-center align-items-center">
-            
+
             <!-- Left Image -->
             <div class="col-lg-5 d-none d-lg-block">
                 <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80" alt="Creative Work" class="img-fluid rounded-4 shadow-lg">
@@ -56,14 +64,14 @@
 
             <!-- Right Form -->
             <div class="col-lg-7">
-               <div class="card border-0 shadow-lg rounded-4 p-4" style="background: rgba(255, 255, 255, 0.85);">
+                <div class="card border-0 shadow-lg rounded-4 p-4" style="background: rgba(255, 255, 255, 0.85);">
                     <div class="card-body">
                         <h2 class="fw-bold text-blue mb-3 text-center">Personalized Quote Request</h2>
                         <p class="text-muted text-center mb-4">Complete the steps below, and we’ll provide a tailored quote within 24 hours.</p>
-                        
+
                         <form id="multiStepForm" action="" method="POST">
                             @csrf
-                            
+
                             <!-- Step 1 -->
                             <div class="form-step">
                                 <div class="mb-4">
@@ -230,138 +238,8 @@
     </div>
 </section>
 
-<!-- === STYLES & ANIMATIONS === -->
-<style>
-.text-gradient {
-    background: linear-gradient(90deg, #0d6efd, #ffc107);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.text-blue { color: #0d6efd !important; }
-.text-gold { color: #ffc107 !important; }
-
-.btn-gold {
-    background-color: #ffc107;
-    color: #0d6efd;
-    transition: all 0.3s ease;
-}
-.btn-gold:hover {
-    background-color: #0d6efd;
-    color: #ffc107;
-}
-
-.hero-btn:hover {
-    transform: translateY(-2px);
-    transition: all 0.3s ease;
-}
-
-.bg-glass {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.glow-btn {
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.glow-btn::after {
-    content: "";
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(120deg, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.3));
-    transition: all 0.6s;
-}
-
-.glow-btn:hover::after {
-    left: 100%;
-}
-
-.glow-btn:hover {
-    transform: scale(1.03);
-    box-shadow: 0 10px 25px rgba(13,110,253,0.4);
-}
-
-.hero-section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-}
-
-.bg-glass {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-}
-.text-blue { color: #0d6efd !important; }
-.btn-gold {
-    background-color: #ffc107;
-    color: #0d6efd;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-.btn-gold:hover { background-color: #0d6efd; color: #ffc107; }
-.card-body input, .card-body select, .card-body textarea {
-    background-color: #f8f9fa;
-    border: 0;
-    padding: 1rem;
-    transition: all 0.3s ease;
-}
-.card-body input:focus, .card-body select:focus, .card-body textarea:focus {
-    outline: none;
-    background-color: #fff;
-    box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.25);
-}
-</style>
-
-<!-- === AOS Animation === -->
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    AOS.init({ duration: 1000, once: true });
-});
-
-
-document.addEventListener('DOMContentLoaded', function(){
-    const form = document.getElementById('multiStepForm');
-    const steps = form.querySelectorAll('.form-step');
-    let currentStep = 0;
-
-    function showStep(step) {
-        steps.forEach((s, i) => {
-            s.classList.toggle('d-none', i !== step);
-        });
-    }
-
-    form.querySelectorAll('.btn-next').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent any default behavior
-            if(currentStep < steps.length - 1) {
-                currentStep++;
-                showStep(currentStep);
-            }
-        });
-    });
-
-    form.querySelectorAll('.btn-prev').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent any default behavior
-            if(currentStep > 0) {
-                currentStep--;
-                showStep(currentStep);
-            }
-        });
-    });
-
-    showStep(currentStep);
-});
-</script>
-
 @endsection
 
-
+@push('scripts')
+<script src="{{ asset('js/public/packages/custom.js') }}"></script>
+@endpush

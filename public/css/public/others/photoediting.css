@@ -1,0 +1,510 @@
+:root {
+    --primary-color: #0d6efd;
+    --accent-color: #f5c542;
+    --secondary-color: #00f5ff;
+    --highlight-color: #ff4d6d;
+    --text-dark: #1a1a1a;
+    --text-light: #f8f9fa;
+    --shadow-dark: 0 8px 40px rgba(0, 0, 0, 0.3);
+    --glow-primary: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
+    --transition-fast: 0.3s ease;
+}
+
+/* =====================================================
+   HERO SECTION LAYOUT
+===================================================== */
+.hero-section {
+    position: relative;
+    background-size: cover;
+    /* Cover entire section */
+    background-position: center;
+    /* Center the image */
+    background-repeat: no-repeat;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    overflow: hidden;
+}
+
+/* LEFT SIDE */
+.hero-left {
+    z-index: 2;
+}
+
+.hero-title {
+    text-shadow: 2px 2px 15px var(--primary-color);
+    animation: slideDown 1.2s ease forwards;
+    opacity: 0;
+}
+
+.hero-subtitle {
+    text-shadow: 1px 1px 10px #000;
+    animation: fadeIn 1.5s ease forwards;
+    opacity: 0;
+}
+
+.hero-btn {
+    transition: all var(--transition-fast);
+    box-shadow: 0 0 0px transparent;
+}
+
+.hero-btn:hover {
+    transform: scale(1.1);
+    box-shadow: var(--glow-primary);
+}
+
+/* RIGHT SIDE: IMAGE */
+.hero-img-wrapper {
+    position: relative;
+    height: 400px;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    background-image: url("https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0?auto=format&fit=crop&w=800&q=80");
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.hero-img:hover {
+    transform: scale(1.05);
+    filter: brightness(1.05);
+}
+
+.hero-img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(13, 110, 253, 0.4),
+        rgba(0, 0, 0, 0.6)
+    );
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+    .hero-left {
+        text-align: center !important;
+    }
+
+    .hero-img-wrapper {
+        height: 300px;
+        margin-top: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+}
+
+.gallery-card {
+    overflow: hidden;
+    border-radius: 12px;
+    height: 250px;
+    /* Equal height for all cards */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    background: #000;
+    /* fallback */
+}
+
+.gallery-card img.gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Ensures all images fill card equally */
+    transition: transform 0.5s ease, filter 0.5s ease;
+}
+
+.gallery-card:hover img.gallery-img {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+}
+
+.before-after-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.ba-slider {
+    position: relative;
+    max-width: 700px;
+    /* Limits the width */
+    height: 400px;
+    /* Fixed height for neat layout */
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.ba-slider img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Ensures image fills container without distortion */
+    display: block;
+}
+
+.ba-before,
+.ba-after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ba-after {
+    clip-path: inset(0 50% 0 0);
+    /* Starts with 50% visible */
+    transition: clip-path 0.3s ease;
+}
+
+.ba-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 100%;
+    background: #0d6efd;
+    /* Bootstrap primary color */
+    cursor: ew-resize;
+    box-shadow: 0 0 10px #0d6efd, 0 0 20px #0d6efd;
+    transition: left 0.2s ease;
+    border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+    .ba-slider {
+        height: 300px;
+    }
+}
+
+@media (max-width: 576px) {
+    .ba-slider {
+        height: 250px;
+    }
+}
+
+.before-after-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.ba-slider {
+    position: relative;
+    max-width: 700px;
+    /* Limits the width */
+    height: 400px;
+    /* Fixed height for neat layout */
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.ba-slider img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Ensures image fills container without distortion */
+    display: block;
+}
+
+.ba-before,
+.ba-after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.ba-after {
+    clip-path: inset(0 50% 0 0);
+    /* Starts with 50% visible */
+    transition: clip-path 0.3s ease;
+}
+
+.ba-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 100%;
+    background: #0d6efd;
+    /* Bootstrap primary color */
+    cursor: ew-resize;
+    box-shadow: 0 0 10px #0d6efd, 0 0 20px #0d6efd;
+    transition: left 0.2s ease;
+    border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+    .ba-slider {
+        height: 300px;
+    }
+}
+
+@media (max-width: 576px) {
+    .ba-slider {
+        height: 250px;
+    }
+}
+
+.workflow-section {
+    position: relative;
+    overflow: hidden;
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+/* Connecting line */
+.workflow-line {
+    position: absolute;
+    top: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 3px;
+    background: rgba(13, 110, 253, 0.3);
+    border-radius: 10px;
+    z-index: 0;
+}
+
+/* Each step card */
+.workflow-card {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.workflow-card:hover {
+    transform: translateY(-8px);
+}
+
+/* The circular step number */
+.workflow-step {
+    width: 100px;
+    height: 100px;
+    background: var(--bs-primary);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.7),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.workflow-step::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -80px;
+    transform: translateY(-50%);
+    width: 70px;
+    height: 3px;
+    background: rgba(13, 110, 253, 0.4);
+}
+
+.workflow-card:last-child .workflow-step::after {
+    display: none;
+}
+
+/* Glow animation */
+.workflow-step:hover {
+    box-shadow: 0 0 40px rgba(13, 110, 253, 0.9),
+        inset 0 0 25px rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+/* Responsive layout */
+@media (max-width: 991px) {
+    .workflow-line {
+        display: none;
+    }
+
+    .workflow-step::after {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .workflow-step {
+        width: 80px;
+        height: 80px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Reveal animation */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* =====================================================
+   GLOBAL ANIMATIONS
+===================================================== */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.service-card,
+.workflow-card,
+.testimonial-card,
+.gallery-card {
+    border-radius: var(--radius-md);
+    transition: all 0.5s ease;
+}
+
+.service-card:hover,
+.workflow-card:hover,
+.testimonial-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--glow-primary);
+}
+
+.service-card .service-icon {
+    transition: all 0.5s ease;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.2);
+}
+
+.ba-slider {
+    position: relative;
+    overflow: hidden;
+    cursor: ew-resize;
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-dark);
+}
+
+.ba-handle {
+    width: 6px;
+    height: 100%;
+    background: var(--primary-color);
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: var(--glow-primary);
+    cursor: ew-resize;
+    transition: left 0.2s ease;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hover-zoom {
+    transition: transform 0.6s ease;
+}
+
+.hover-zoom:hover {
+    transform: scale(1.05);
+}
+
+@keyframes fadeInPage {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

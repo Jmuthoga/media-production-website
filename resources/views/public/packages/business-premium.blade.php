@@ -2,10 +2,19 @@
 
 @section('title', 'Premium All-Inclusive Deals')
 
+
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/public/packages/business-premium.css') }}">
+@endpush
+
 @section('content')
 <!-- === HERO SECTION === -->
 <section class="hero-section text-white d-flex align-items-center"
-         style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)),
+  style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)),
          url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=700&q=80') center/cover no-repeat; min-height: 90vh;">
   <div class="container text-center" data-aos="fade-up">
     <h1 class="display-4 fw-bold mb-3 text-warning">Premium All-Inclusive Deals</h1>
@@ -29,7 +38,7 @@
       <div class="col-md-4" data-aos="zoom-in">
         <div class="card border-0 shadow-lg h-100 text-center overflow-hidden position-relative" style="border-radius: 1rem;">
           <img src="https://images.unsplash.com/photo-1503424886306-3d9d94c8c1f3?auto=format&fit=crop&w=700&q=80"
-               class="card-img-top" alt="Silver Package" style="height:240px; object-fit:cover;">
+            class="card-img-top" alt="Silver Package" style="height:240px; object-fit:cover;">
           <div class="card-body p-4">
             <h5 class="fw-bold text-dark mt-3 fs-4">Silver Deal</h5>
             <p class="text-muted mt-2 mb-4">Perfect for individuals or small teams looking for a full-service package at an affordable rate.</p>
@@ -47,9 +56,9 @@
       <!-- Gold Deal (Most Popular) -->
       <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
         <div class="card border-0 shadow-lg h-100 text-center overflow-hidden position-relative highlight-card"
-             style="border-radius: 1rem;">
+          style="border-radius: 1rem;">
           <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=700&q=80"
-               class="card-img-top" alt="Gold Package" style="height:240px; object-fit:cover;">
+            class="card-img-top" alt="Gold Package" style="height:240px; object-fit:cover;">
           <div class="card-body p-4">
             <h5 class="fw-bold text-warning mt-3 fs-4">Gold Deal</h5>
             <p class="text-muted mt-2 mb-4">Our most popular option, offering extended coverage and enhanced creative direction.</p>
@@ -69,7 +78,7 @@
       <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
         <div class="card border-0 shadow-lg h-100 text-center overflow-hidden position-relative" style="border-radius: 1rem;">
           <img src="https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?auto=format&fit=crop&w=700&q=80"
-               class="card-img-top" alt="Platinum Package" style="height:240px; object-fit:cover;">
+            class="card-img-top" alt="Platinum Package" style="height:240px; object-fit:cover;">
           <div class="card-body p-4">
             <h5 class="fw-bold text-dark mt-3 fs-4">Platinum Elite</h5>
             <p class="text-muted mt-2 mb-4">For clients who want nothing short of perfection — luxury service from concept to final cut.</p>
@@ -95,7 +104,7 @@
     <div class="row align-items-center">
       <div class="col-md-6" data-aos="fade-right">
         <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=700&q=80"
-             alt="About Premium Deals" class="img-fluid rounded-4 shadow-lg">
+          alt="About Premium Deals" class="img-fluid rounded-4 shadow-lg">
       </div>
       <div class="col-md-6 mt-4 mt-md-0" data-aos="fade-left">
         <h2 class="fw-bold mb-3 text-warning">Why Choose Our All-Inclusive Packages?</h2>
@@ -114,7 +123,7 @@
 
 <!-- === CALL TO ACTION === -->
 <section class="text-white text-center py-5"
-         style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+  style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
          url('https://images.unsplash.com/photo-1526178613552-2d4b5e34c99b?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;">
   <div class="container" data-aos="zoom-in">
     <h2 class="fw-bold mb-3">Ready to Enjoy a Premium Experience?</h2>
@@ -122,25 +131,8 @@
     <a href="#packages" class="btn btn-warning btn-lg rounded-pill px-4 text-dark fw-bold">Get Started</a>
   </div>
 </section>
-
-<!-- === STYLES & JS === -->
-<style>
-  .highlight-card::after {
-    content: "Most Popular";
-    position: absolute; top: 15px; right: -45px;
-    background: gold; color: #000; font-size: 0.8rem;
-    font-weight: 700; transform: rotate(45deg);
-    width: 160px; text-align: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-  }
-  .card:hover { transform: translateY(-10px) scale(1.02); transition: 0.4s; }
-</style>
-
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    AOS.init({ duration: 1200, once: true });
-  });
-</script>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/public/packages/business-premium.js') }}"></script>
+@endpush

@@ -1,0 +1,19 @@
+.highlight-card::after {
+    content: "Most Popular";
+    position: absolute;
+    top: 15px;
+    right: -45px;
+    background: gold;
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transform: rotate(45deg);
+    width: 160px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    transition: 0.4s;
+}
