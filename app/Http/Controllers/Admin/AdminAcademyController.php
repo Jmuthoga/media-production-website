@@ -340,6 +340,19 @@ class AdminAcademyController extends Controller
             ->with('success', 'Hero section saved successfully.');
     }
 
+    public function internshipHeroDelete()
+    {
+        $hero = InternshipAttachment::where('type', 'hero')->first();
+
+        if ($hero) {
+            $hero->delete();
+            return redirect()->route('internships.index')->with('success', 'Hero section deleted successfully.');
+        }
+
+        return redirect()->route('internships.index')->with('error', 'Hero section not found.');
+    }
+
+
    /* ===========================
  *   PAGE INFORMATION (INTERNSHIP PAGE)
  * =========================== */

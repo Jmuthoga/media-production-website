@@ -107,13 +107,36 @@ Auth::routes();
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
-    // Our Story & Mission
-    Route::get('admin/aboutus/story', [AdminAboutUsController::class, 'storyIndex'])->name('admin.aboutus.story.index');
-    Route::get('admin/aboutus/story/create', [AdminAboutUsController::class, 'storyCreate'])->name('admin.aboutus.story.create');
-    Route::post('admin/aboutus/story', [AdminAboutUsController::class, 'storyStore'])->name('admin.aboutus.story.store');
-    Route::get('admin/aboutus/story/{item}/edit', [AdminAboutUsController::class, 'storyEdit'])->name('admin.aboutus.story.edit');
-    Route::put('admin/aboutus/story/{item}', [AdminAboutUsController::class, 'storyUpdate'])->name('admin.aboutus.story.update');
-    Route::delete('admin/aboutus/story/{item}', [AdminAboutUsController::class, 'storyDestroy'])->name('admin.aboutus.story.destroy');
+
+    // === Our Story & Mission CRUD ===
+    Route::get('admin/aboutus/story', [AdminAboutUsController::class, 'index'])->name('admin.aboutus.story.index');
+    Route::get('admin/aboutus/story/create', [AdminAboutUsController::class, 'create'])->name('admin.aboutus.story.create');
+    Route::post('admin/aboutus/story', [AdminAboutUsController::class, 'store'])->name('admin.aboutus.story.store');
+    Route::get('admin/aboutus/story/{story}/edit', [AdminAboutUsController::class, 'edit'])->name('admin.aboutus.story.edit');
+    Route::put('admin/aboutus/story/{story}', [AdminAboutUsController::class, 'update'])->name('admin.aboutus.story.update');
+    Route::delete('admin/aboutus/story/{story}', [AdminAboutUsController::class, 'destroy'])->name('admin.aboutus.story.destroy');
+
+    // === Hero Section Routes ===
+    Route::get('admin/aboutus/story/hero', [AdminAboutUsController::class, 'heroForm'])->name('admin.aboutus.story.hero.form');
+    Route::post('admin/aboutus/story/hero', [AdminAboutUsController::class, 'heroSave'])->name('admin.aboutus.story.hero.save');
+    Route::delete('admin/aboutus/story/hero/delete', [AdminAboutUsController::class, 'heroDelete'])->name('admin.aboutus.story.hero.delete');
+
+    // === Page Info Section Routes ===
+    Route::get('admin/aboutus/story/page-info', [AdminAboutUsController::class, 'pageInfoForm'])->name('admin.aboutus.story.page_info.form');
+    Route::post('admin/aboutus/story/page-info', [AdminAboutUsController::class, 'pageInfoSave'])->name('admin.aboutus.story.page_info.save');
+
+    // === FAQ & Side Feature Section Routes ===
+    Route::get('admin/aboutus/story/faq', [AdminAboutUsController::class, 'faqForm'])->name('admin.aboutus.story.faq.form');
+    Route::post('admin/aboutus/story/faq', [AdminAboutUsController::class, 'faqSave'])->name('admin.aboutus.story.faq.save');
+
+    // === Our Clients Section Routes ===
+    Route::get('admin/aboutus/story/clients/create', [AdminAboutUsController::class, 'clientsCreate'])->name('admin.aboutus.story.clients.create');
+    Route::post('admin/aboutus/story/clients', [AdminAboutUsController::class, 'clientsStore'])->name('admin.aboutus.story.clients.store');
+    Route::get('admin/aboutus/story/clients/{client}/edit', [AdminAboutUsController::class, 'clientsEdit'])->name('admin.aboutus.story.clients.edit');
+    Route::put('admin/aboutus/story/clients/{client}', [AdminAboutUsController::class, 'clientsUpdate'])->name('admin.aboutus.story.clients.update');
+    Route::delete('admin/aboutus/story/clients/{client}', [AdminAboutUsController::class, 'clientsDestroy'])->name('admin.aboutus.story.clients.destroy');
+
+
 
     // Our Brands & Achievements
     Route::get('admin/aboutus/brands', [AdminAboutUsController::class, 'brandIndex'])->name('admin.aboutus.brands.index');
@@ -330,6 +353,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/internships/hero/update', [AdminAcademyController::class, 'internshipHeroUpdate'])->name('internships.hero.update');
     Route::get('admin/internships/hero', [AdminAcademyController::class, 'internshipHeroForm'])->name('internships.hero.form');
     Route::post('admin/internships/hero', [AdminAcademyController::class, 'internshipHeroSave'])->name('internships.hero.save');
+    Route::delete('admin/internships/hero', [AdminAcademyController::class, 'internshipHeroDelete'])->name('internships.hero.delete');
 
     // Role-specific create/store/edit/update (pattern — repeat for stat/offer/requirement if desired)
     Route::get('/internships/roles/create', [AdminAcademyController::class, 'internshipRoleCreate'])->name('internships.roles.create');
