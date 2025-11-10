@@ -28,37 +28,32 @@
                 <input type="text" name="duration" class="form-control" placeholder="e.g. 3 months" value="{{ old('duration') }}">
             </div>
 
-            <!-- Type (excluding hero & role) -->
+            <!-- Type -->
             <div class="col-md-6">
-                <label class="form-label">Type <span class="text-danger">*</span></label>
+                <label class="form-label">Type</label>
                 <select name="type" id="type" class="form-select" required>
                     <option value="">-- Select Type --</option>
-                    <option value="stat" {{ old('type')=='stat' ? 'selected' : '' }}>Statistic</option>
+                    <option value="role" {{ old('type')=='role' ? 'selected' : '' }}>Role</option>
                     <option value="offer" {{ old('type')=='offer' ? 'selected' : '' }}>Offer</option>
                     <option value="requirement" {{ old('type')=='requirement' ? 'selected' : '' }}>Requirement</option>
                 </select>
             </div>
 
             <!-- Apply Link -->
-            <div class="col-md-6 optional-field type-offer">
+            <div class="col-md-6 optional-field type-role type-offer type-hero">
                 <label class="form-label">Apply Link</label>
                 <input type="url" name="apply_link" class="form-control" value="{{ old('apply_link') }}">
             </div>
 
             <!-- Icon -->
-            <div class="col-md-6 optional-field type-stat type-offer type-requirement">
+            <div class="col-md-6 optional-field type-role type-stat type-offer type-requirement">
                 <label class="form-label">Icon (Bootstrap class)</label>
                 <input type="text" name="icon" class="form-control" placeholder="e.g. bi-camera-fill" value="{{ old('icon') }}">
             </div>
 
-            <!-- Stat Value -->
-            <div class="col-md-6 optional-field type-stat">
-                <label class="form-label">Stat Value</label>
-                <input type="number" name="stat_value" class="form-control" value="{{ old('stat_value') }}">
-            </div>
 
             <!-- Image -->
-            <div class="col-md-6 optional-field type-offer">
+            <div class="col-md-6 optional-field type-hero type-offer">
                 <label class="form-label">Image</label>
                 <input type="file" name="image" class="form-control">
             </div>
@@ -76,6 +71,7 @@
         </div>
     </form>
 </div>
+
 @endsection
 
 @push('scripts')
