@@ -5,19 +5,19 @@
 <div class="row">
     <div class="col-md-3">
         <div class="card p-3">
-            <h4>{{ $pages }}</h4>
+            <h4></h4>
             <p>Pages</p>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card p-3">
-            <h4>{{ $services }}</h4>
+            <h4></h4>
             <p>Services</p>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card p-3">
-            <h4>{{ $gallery }}</h4>
+            <h4></h4>
             <p>Gallery</p>
         </div>
     </div>

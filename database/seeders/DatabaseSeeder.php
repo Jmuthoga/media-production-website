@@ -22,5 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             InitialDataSeeder::class,
         ]);
+
+        $this->call(InternshipAttachmentSeeder::class);
     }
 }

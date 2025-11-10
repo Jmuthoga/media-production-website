@@ -11,12 +11,6 @@ class InitialDataSeeder extends Seeder
 {
     public function run()
     {
-        $cats = ['Photography', 'Videography', 'Our Work', 'Academy', 'Others'];
-        foreach ($cats as $c) Category::create(['name' => $c, 'slug' => \Str::slug($c), 'description' => "Services under {$c}"]);
-
-        $counties = ['Nairobi', 'Kiambu', 'Mombasa', 'Kisumu', 'Nakuru', 'Machakos', 'Meru', 'Kisii', 'Kericho', 'Kilifi'];
-        foreach ($counties as $cn) County::create(['name' => $cn, 'slug' => \Str::slug($cn), 'description' => "Services in {$cn}"]);
-
         // create an admin user
         User::create([
             'name' => 'Admin',

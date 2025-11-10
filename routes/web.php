@@ -230,7 +230,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('admin/photography/tiktok/{tiktok}', [AdminPhotographyController::class, 'tiktokDestroy'])->name('admin.photography.tiktok.destroy');
 
 
-        // 1️⃣ Weddings & Engagements
+    // 1️⃣ Weddings & Engagements
     Route::get('/weddings-engagements', [AdminVideographyController::class, 'weddingsIndex'])->name('admin.videography.weddings.index');
     Route::get('/weddings-engagements/create', [AdminVideographyController::class, 'weddingsCreate'])->name('admin.videography.weddings.create');
     Route::post('/weddings-engagements', [AdminVideographyController::class, 'weddingsStore'])->name('admin.videography.weddings.store');
@@ -302,7 +302,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('/liveshows-streaming/{live}', [AdminVideographyController::class, 'liveshowsUpdate'])->name('admin.videography.liveshows.update');
     Route::delete('/liveshows-streaming/{live}', [AdminVideographyController::class, 'liveshowsDestroy'])->name('admin.videography.liveshows.destroy');
 
-        // Photography
+    // Photography
     Route::get('/photography', [AdminAcademyController::class, 'photographyIndex'])->name('photography.index');
     Route::get('/photography/create', [AdminAcademyController::class, 'photographyCreate'])->name('photography.create');
     Route::post('/photography', [AdminAcademyController::class, 'photographyStore'])->name('photography.store');
@@ -325,8 +325,29 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/internships/{internship}/edit', [AdminAcademyController::class, 'internshipEdit'])->name('internships.edit');
     Route::put('/internships/{internship}', [AdminAcademyController::class, 'internshipUpdate'])->name('internships.update');
     Route::delete('/internships/{internship}', [AdminAcademyController::class, 'internshipDestroy'])->name('internships.destroy');
+    // Hero section (separate)
+    Route::get('/internships/hero/edit', [AdminAcademyController::class, 'internshipHeroEdit'])->name('internships.hero.edit');
+    Route::post('/internships/hero/update', [AdminAcademyController::class, 'internshipHeroUpdate'])->name('internships.hero.update');
+    Route::get('admin/internships/hero', [AdminAcademyController::class, 'internshipHeroForm'])->name('internships.hero.form');
+    Route::post('admin/internships/hero', [AdminAcademyController::class, 'internshipHeroSave'])->name('internships.hero.save');
 
-        // Printing & Branding
+    // Role-specific create/store/edit/update (pattern — repeat for stat/offer/requirement if desired)
+    Route::get('/internships/roles/create', [AdminAcademyController::class, 'internshipRoleCreate'])->name('internships.roles.create');
+    Route::post('/internships/roles', [AdminAcademyController::class, 'internshipRoleStore'])->name('internships.roles.store');
+    Route::get('/internships/roles/{internship}/edit', [AdminAcademyController::class, 'internshipRoleEdit'])->name('internships.roles.edit');
+    Route::put('/internships/roles/{internship}', [AdminAcademyController::class, 'internshipRoleUpdate'])->name('internships.roles.update');
+
+    // Toggle role status
+    Route::put('/internships/{internship}/toggle-status', [AdminAcademyController::class, 'internshipToggleStatus'])->name('internships.toggleStatus');
+
+    // Page info (about1, about2, stats, youtube)
+    Route::get('/internships/page-info', [AdminAcademyController::class, 'internshipPageInfoForm'])->name('internships.pageinfo.form');
+    Route::post('/internships/page-info', [AdminAcademyController::class, 'internshipPageInfoSave'])->name('internships.pageinfo.save');
+
+
+
+
+    // Printing & Branding
     Route::get('/printing', [AdminOthersController::class, 'printingIndex'])->name('printing.index');
     Route::get('/printing/create', [AdminOthersController::class, 'printingCreate'])->name('printing.create');
     Route::post('/printing', [AdminOthersController::class, 'printingStore'])->name('printing.store');
@@ -476,5 +497,4 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('settings/users/{id}/edit', [SettingsController::class, 'userEdit'])->name('admin.settings.users.edit');
     Route::put('settings/users/{id}', [SettingsController::class, 'userUpdate'])->name('admin.settings.users.update');
     Route::delete('settings/users/{id}', [SettingsController::class, 'userDestroy'])->name('admin.settings.users.destroy');
-
 });
