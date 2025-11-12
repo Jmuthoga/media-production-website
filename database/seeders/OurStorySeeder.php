@@ -63,7 +63,7 @@ class OurStorySeeder extends Seeder
                         'answer' => 'We provide professional photography, videography, branding, and creative media services for both individuals and businesses.'
                     ],
                     [
-                        'question' => 'How can I book your services?',
+                        'question' => 'How can I book your services there?',
                         'answer' => 'Bookings can be made directly through our website’s contact page or by reaching us via email or phone. We also respond quickly on WhatsApp.'
                     ],
                     [

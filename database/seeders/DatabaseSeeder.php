@@ -23,6 +23,11 @@ class DatabaseSeeder extends Seeder
             InitialDataSeeder::class,
         ]);
 
-        $this->call(InternshipAttachmentSeeder::class);
+        $this->call([
+            OurStorySeeder::class,
+        ]);
+
+        $this->call
+        (InternshipAttachmentSeeder::class);
     }
 }
