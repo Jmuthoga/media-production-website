@@ -10,31 +10,76 @@
     ============================ -->
     <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
         <h1 class="mb-2 mb-md-0">Our Story & Mission</h1>
-        <div class="d-flex flex-wrap gap-2">
-            @php
-                $hero = $stories->where('type', 'hero')->first();
-                $pageInfo = $stories->where('type', 'page_info')->first();
-                $faqSection = $stories->where('type', 'faq')->first();
-                $clients = $stories->where('type', 'clients');
-            @endphp
 
-            <a href="{{ route('admin.aboutus.story.hero.form') }}" class="btn btn-outline-primary">
-                {{ $hero ? 'Edit Hero' : 'Create Hero' }}
-            </a>
+        <div class="dropdown">
+            <button class="btn btn-gradient-primary dropdown-toggle px-4 py-2 d-flex align-items-center gap-2 shadow-sm" 
+                    type="button" id="manageSectionsDropdown" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gear-fill"></i> Manage Sections
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-3 p-2" 
+                aria-labelledby="manageSectionsDropdown" style="min-width: 250px;">
 
-            <a href="{{ route('admin.aboutus.story.page_info.form') }}" class="btn btn-outline-info">
-                {{ $pageInfo ? 'Edit Page Info' : 'Create Page Info' }}
-            </a>
+                @php
+                    $hero = $stories->where('type', 'hero')->first();
+                    $pageInfo = $stories->where('type', 'page_info')->first();
+                    $faqSection = $stories->where('type', 'faq')->first();
+                    $clientsList = $clients;
+                @endphp
 
-            <a href="{{ route('admin.aboutus.story.faq.form') }}" class="btn btn-outline-success">
-                {{ $faqSection ? 'Edit FAQ & Side Feature' : 'Create FAQ & Side Feature' }}
-            </a>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded" 
+                    href="{{ route('admin.aboutus.story.hero.form') }}">
+                        <i class="bi bi-image-fill text-primary"></i>
+                        {{ $hero ? 'Edit Hero Section' : 'Create Hero Section' }}
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded" 
+                    href="{{ route('admin.aboutus.story.page_info.form') }}">
+                        <i class="bi bi-file-text-fill text-info"></i>
+                        {{ $pageInfo ? 'Edit Page Info Section' : 'Create Page Info Section' }}
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded" 
+                    href="{{ route('admin.aboutus.story.faq.form') }}">
+                        <i class="bi bi-question-circle-fill text-success"></i>
+                        {{ $faqSection ? 'Edit FAQ & Side Feature' : 'Create FAQ & Side Feature' }}
+                    </a>
+                </li>
 
-            <a href="{{ route('admin.aboutus.story.clients.create') }}" class="btn btn-outline-warning">
-                Add Client
-            </a>
+                <li><hr class="dropdown-divider"></li>
+
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded" 
+                    href="{{ route('admin.aboutus.story.clients.create') }}">
+                        <i class="bi bi-person-badge-fill text-warning"></i>
+                        Add Client
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
+
+    <!-- Optional custom style -->
+    <style>
+        .btn-gradient-primary {
+            background: linear-gradient(90deg, #007bff 0%, #6610f2 100%);
+            color: #fff;
+            border: none;
+            transition: 0.3s ease;
+        }
+        .btn-gradient-primary:hover {
+            background: linear-gradient(90deg, #0056b3 0%, #520dc2 100%);
+            color: #fff;
+        }
+        .dropdown-item:hover {
+            background-color: #f1f3f5;
+        }
+    </style>
+
+
 
     <!-- ============================
          SUCCESS ALERT
@@ -189,19 +234,33 @@
         </div>
 
         <div class="card-body">
-            @if($clients->count())
+            @if($clientsList->count())
                 <div class="row">
-                    @foreach($clients as $client)
-                        <div class="col-md-3 mb-4">
-                            <div class="card border-0 shadow-sm">
+                    @foreach($clientsList as $client)
+                        <div class="col-6 col-md-3 mb-4">
+                            <div class="card border-0 shadow-sm text-center p-3 h-100">
                                 @if($client->image)
-                                    <img src="{{ asset('storage/'.$client->image) }}" class="card-img-top" alt="{{ $client->title }}">
+                                    <div class="d-flex justify-content-center align-items-center" 
+                                        style="height:120px; overflow:hidden;">
+                                        <img src="{{ asset('storage/'.$client->image) }}" 
+                                            alt="{{ $client->title }}"
+                                            style="max-height:100px; max-width:100%; object-fit:contain;">
+                                    </div>
+                                @else
+                                    <div class="d-flex justify-content-center align-items-center bg-light" 
+                                        style="height:120px;">
+                                        <span class="text-muted small">No Logo</span>
+                                    </div>
                                 @endif
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">{{ $client->title ?? 'Untitled Client' }}</h6>
+
+                                <div class="mt-3">
+                                    <h6 class="card-title mb-2">{{ $client->title ?? 'Untitled Client' }}</h6>
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ route('admin.aboutus.story.clients.edit', $client) }}" class="btn btn-sm btn-outline-info">Edit</a>
-                                        <form action="{{ route('admin.aboutus.story.clients.destroy', $client) }}" method="POST" onsubmit="return confirm('Delete this client?')">
+                                        <a href="{{ route('admin.aboutus.story.clients.edit', $client) }}" 
+                                        class="btn btn-sm btn-outline-info">Edit</a>
+                                        <form action="{{ route('admin.aboutus.story.clients.destroy', $client) }}" 
+                                            method="POST" 
+                                            onsubmit="return confirm('Delete this client?')">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-outline-danger">Delete</button>
@@ -217,8 +276,6 @@
             @endif
         </div>
     </div>
-
-
 </div>
 @endsection
 

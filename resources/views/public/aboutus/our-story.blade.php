@@ -7,52 +7,54 @@
 @endpush
 
 @section('content')
-<!-- === Hero Section with Animated Tech Lines === -->
-<section class="about-hero">
+
+@php
+$heroBgUrl = !empty($heroMeta['hero_image'])
+    ? asset('storage/'.$heroMeta['hero_image'])
+    : 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?q=80&w=1600&auto=format&fit=crop';
+
+$heroRightUrl = !empty($heroMeta['hero_right_image'])
+    ? asset('storage/'.$heroMeta['hero_right_image'])
+    : $heroBgUrl;
+
+$about1 = $pageMeta['about_paragraph1'] ?? 'Founded on creativity and innovation, JM Innovatech Photography has grown into a trusted name in visual storytelling.';
+$about2 = $pageMeta['about_paragraph2'] ?? 'From weddings and corporate events to brand campaigns and studio productions — our team ensures excellence in every frame.';
+$videoId = $pageMeta['video_id'] ?? 'nXo4uQ1iA3Y';
+@endphp
+
+<!-- === Hero Section === -->
+<section class="about-hero" style="background: linear-gradient(rgba(0,43,255,0.65), rgba(0,85,255,0.65)), url('{{ $heroBgUrl }}') center/cover no-repeat;">
     <canvas id="tech-lines"></canvas>
     <div class="content">
         <div class="text-box">
-            <h2>Who Are We – Why Us?</h2>
-            <p>
-                At Unimax Photography, we are more than just a creative studio — we’re storytellers driven by passion,
-                precision, and purpose. With a blend of art and technology, we bring your moments to life through
-                captivating visuals, cinematic quality, and unmatched professionalism.
-            </p>
+            <h2>{{ $hero->title ?? 'Who Are We – Why Us?' }}</h2>
+            <p>{{ $hero->description ?? 'At JM Innovatech Photography, we are more than just a creative studio — we’re storytellers driven by passion, precision, and purpose.' }}</p>
         </div>
 
-        <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?q=80&w=800&auto=format&fit=crop"
-            alt="Our Team">
+        <img src="{{ $heroRightUrl }}" alt="Our Team">
     </div>
 </section>
 
-<!-- === About Company + YouTube + Counters Section === -->
+<!-- === About Company + YouTube + Counters === -->
 <section class="about-company-section py-5">
     <div class="container py-4">
         <div class="row align-items-center g-5">
             <!-- Left: About Text -->
-            <div class="col-lg-6 col-md-12">
+            <div class="col-lg-6">
                 <h2>About Us</h2>
-                <p class="text-muted" style="line-height: 1.8;">
-                    Founded on creativity and innovation, Unimax Photography has grown into a trusted name in visual
-                    storytelling. We combine artistic vision, advanced technology, and a customer-first approach to
-                    capture the essence of every moment.
-                </p>
-                <p class="text-muted" style="line-height: 1.8;">
-                    From weddings and corporate events to brand campaigns and studio productions — our team ensures
-                    excellence in every frame. With over a decade of experience, we’ve turned thousands of memories into
-                    timeless visuals that inspire and connect.
-                </p>
+                <p class="text-muted" style="line-height: 1.8;">{{ $about1 }}</p>
+                <p class="text-muted" style="line-height: 1.8;">{{ $about2 }}</p>
 
-                <!-- Counters -->
+                <!-- Stats -->
                 <div class="row text-center mt-4">
+                    @foreach ($stats->take(2) as $stat)
                     <div class="col-6 mb-3">
-                        <h3 class="fw-bold text-primary"><span class="counter" data-target="500">0</span>+</h3>
-                        <p class="text-muted mb-0">Client Reviews</p>
+                        <h3 class="fw-bold text-primary">
+                            {{ $stat['value'] ?? 0 }}+
+                        </h3>
+                        <p class="text-muted mb-0">{{ $stat['title'] ?? 'Stat' }}</p>
                     </div>
-                    <div class="col-6 mb-3">
-                        <h3 class="fw-bold text-primary"><span class="counter" data-target="50">0</span>+</h3>
-                        <p class="text-muted mb-0">Support Team & Staff</p>
-                    </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -60,86 +62,70 @@
             <div class="col-lg-6 text-center">
                 <div class="video-box shadow-lg rounded overflow-hidden position-relative">
                     <iframe width="100%" height="315"
-                        src="https://www.youtube.com/embed/nXo4uQ1iA3Y?autoplay=0&mute=1&rel=0&showinfo=0"
-                        title="Unimax Photography Intro" frameborder="0" allowfullscreen></iframe>
+                        src="https://www.youtube.com/embed/{{ $videoId }}?autoplay=0&mute=1&rel=0&showinfo=0"
+                        title="JM Innovatech Photography Intro" frameborder="0" allowfullscreen>
+                    </iframe>
                 </div>
 
-                <!-- Counters Below Video -->
                 <div class="row text-center mt-4">
+                    @foreach ($stats->slice(2,2) as $stat)
                     <div class="col-6 mb-3">
-                        <h3 class="fw-bold text-success"><span class="counter" data-target="3000">0</span>+</h3>
-                        <p class="text-muted mb-0">Projects Completed</p>
+                        <h3 class="fw-bold text-success">
+                            {{ $stat['value'] ?? 0 }}+
+                        </h3>
+                        <p class="text-muted mb-0">{{ $stat['title'] ?? 'Stat' }}</p>
                     </div>
-                    <div class="col-6 mb-3">
-                        <h3 class="fw-bold text-success"><span class="counter" data-target="15">0</span>+</h3>
-                        <p class="text-muted mb-0">Years of Experience</p>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- === FAQS & Side Feature Section (Professional Theme) === -->
+<!-- === FAQ Section === -->
 <section class="faq-section py-5" style="background: #fafafa; font-family: 'Poppins', sans-serif;">
     <div class="container">
         <div class="row align-items-start g-5">
-
-            <!-- FAQs (Left Side) -->
+            <!-- FAQs -->
             <div class="col-lg-6">
                 <h2 class="fw-bold mb-4 position-relative d-inline-block" style="color: #001f5b;">
                     Frequently Asked Questions
                     <span class="underline-animation"></span>
                 </h2>
                 <div class="accordion" id="faqAccordion">
-
-                    <!-- Q1 -->
+                    @forelse ($faqMeta['faqs'] ?? [] as $index => $item)
                     <div class="accordion-item border-0 mb-3 shadow-sm rounded-3">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button fw-semibold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                What services does your company offer?
+                        <h2 class="accordion-header" id="heading{{ $index }}">
+                            <button class="accordion-button {{ $index !== 0 ? 'collapsed' : '' }} fw-semibold text-dark bg-white"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapse{{ $index }}"
+                                aria-expanded="{{ $index === 0 ? 'true' : 'false' }}"
+                                aria-controls="collapse{{ $index }}">
+                                {{ $item['question'] }}
                             </button>
                         </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div id="collapse{{ $index }}" class="accordion-collapse collapse {{ $index === 0 ? 'show' : '' }}"
+                            data-bs-parent="#faqAccordion">
                             <div class="accordion-body text-secondary">
-                                We provide professional photography, videography, branding, and creative media services for both individuals and businesses.
+                                {{ $item['answer'] }}
                             </div>
                         </div>
                     </div>
-
-                    <!-- Q2 -->
-                    <div class="accordion-item border-0 mb-3 shadow-sm rounded-3">
-                        <h2 class="accordion-header" id="headingTwo">
-                            <button class="accordion-button collapsed fw-semibold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                How can I book your services?
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body text-secondary">
-                                Bookings can be made directly through our website’s contact page or by reaching us via email or phone. We also respond quickly on WhatsApp.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Q3 -->
-                    <div class="accordion-item border-0 shadow-sm rounded-3">
-                        <h2 class="accordion-header" id="headingThree">
-                            <button class="accordion-button collapsed fw-semibold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                Do you offer training or internships?
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body text-secondary">
-                                Yes, through our <strong>Unimax Academy</strong> we offer hands-on training, mentorship, and internship opportunities in photography and media production.
-                            </div>
-                        </div>
-                    </div>
-
+                    @empty
+                    <p class="text-muted">No FAQs available at the moment.</p>
+                    @endforelse
                 </div>
             </div>
 
-            <!-- Side Feature (Right Side) -->
+            <!-- Side Feature -->
             <div class="col-lg-6">
+                @php
+                $sideImage = !empty($faqMeta['side_image'])
+                    ? asset('storage/'.$faqMeta['side_image'])
+                    : 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?q=80&w=800&auto=format&fit=crop';
+                @endphp
+
                 <div class="p-4 rounded-4 shadow-sm bg-white text-center">
                     <h3 class="fw-bold mb-3" style="color: #001f5b;">Need More Information?</h3>
                     <p class="text-secondary mb-4">
@@ -149,17 +135,15 @@
                         <i class="bi bi-envelope-fill me-2"></i> Contact Support
                     </a>
                     <div class="mt-5">
-                        <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?q=80&w=800&auto=format&fit=crop" alt="Support Team" class="img-fluid rounded-3" style="max-height: 250px;">
+                        <img src="{{ $sideImage }}" alt="Support Team" class="img-fluid rounded-3" style="max-height: 250px;">
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
 
-
-<!-- === Our Clients Section === -->
+<!-- === Clients Section === -->
 <section class="our-clients-section py-5">
     <div class="container text-center">
         <h2 class="fw-bold mb-4" style="color: #001f5b;">Our Clients</h2>
@@ -167,27 +151,20 @@
 
         <div class="clients-slider">
             <div class="clients-track">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Apple-logo.png" alt="Apple">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Google_Logo.svg" alt="Google">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Adobe_Systems_logo_and_wordmark.svg" alt="Adobe">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Canon_logo.svg" alt="Canon">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Samsung_Logo.svg" alt="Samsung">
-                <!-- Duplicate for seamless loop -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Apple-logo.png" alt="Apple">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Google_Logo.svg" alt="Google">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Adobe_Systems_logo_and_wordmark.svg" alt="Adobe">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Canon_logo.svg" alt="Canon">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Samsung_Logo.svg" alt="Samsung">
+                @forelse ($clients as $client)
+                   <img src="{{ asset('storage/'.$client->image) }}" 
+                        alt="{{ $client->title }}"
+                        style="height: 160px; width: auto; object-fit: contain; margin: 0 40px; filter: grayscale(0%); transition: transform 0.3s ease;"
+                        onmouseover="this.style.transform='scale(1.05)';"
+                        onmouseout="this.style.transform='scale(1)';">
+                @empty
+                    <p class="text-muted">No clients uploaded yet.</p>
+                @endforelse
             </div>
         </div>
     </div>
 </section>
+
 @endsection
 
 @push('scripts')

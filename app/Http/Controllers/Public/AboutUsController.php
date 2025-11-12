@@ -4,13 +4,36 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\InternshipAttachment;
+use App\Models\OurStoryMission;
+use App\Models\OurStoryClient;
 
 class AboutUsController extends Controller
 {
     public function ourStory()
     {
-        return view('public.aboutus.our-story');
+        // Fetch hero section
+        $hero = OurStoryMission::where('type', 'hero')->first();
+
+        // Fetch page info (about paragraphs, video, stats)
+        $page = OurStoryMission::where('type', 'page_info')->first();
+
+        // Fetch FAQs & side feature
+        $faq = OurStoryMission::where('type', 'faq')->first();
+
+        // Fetch clients (logos)
+        $clients = OurStoryClient::all();
+
+        // Decode meta JSON data for hero, page info, and faq
+        $heroMeta = $hero ? json_decode($hero->meta, true) : [];
+        $pageMeta = $page ? json_decode($page->meta, true) : [];
+        $faqMeta  = $faq ? json_decode($faq->meta, true) : [];
+
+        // Stats array inside page meta
+        $stats = collect($pageMeta['stats'] ?? []);
+
+        return view('public.aboutus.our-story', compact(
+            'hero', 'heroMeta', 'page', 'pageMeta', 'stats', 'faq', 'faqMeta', 'clients'
+        ));
     }
 
     public function ourBrands()
