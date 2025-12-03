@@ -1,22 +1,167 @@
 @extends('layouts.app')
 
-@section('title', 'Portrait Photography')
+@section('title', $heroTitle ?? 'Portrait Photography')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/public/photography/portrait.css') }}">
 @endpush
 
+@php
+/* ============================================================
+SAFE BACKEND FALLBACK SYSTEM FOR PORTRAIT PAGE
+============================================================ */
+
+// Make sure $portrait exists to avoid errors
+$portrait = $portrait ?? null;
+
+/* ===========================
+HERO IMAGES
+=========================== */
+$heroBg = ($portrait && !empty($portrait->hero_image))
+? asset('storage/' . $portrait->hero_image)
+: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1200&auto=format&fit=crop';
+
+$heroRight = ($portrait && !empty($portrait->hero_right_image))
+? asset('storage/' . $portrait->hero_right_image)
+: $heroBg;
+
+
+/* ===========================
+DEFAULT GALLERY
+=========================== */
+$defaultGallery = [
+[
+'src' => 'https://images.unsplash.com/photo-1524503033411-c9566986fc8f?q=80&w=1600&auto=format&fit=crop',
+'title' => 'Studio Portrait',
+'description' => 'Classic lighting, refined look for headshots and editorial portraits.',
+],
+[
+'src' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1600&auto=format&fit=crop',
+'title' => 'Outdoor Portrait',
+'description' => 'Natural light and environmental storytelling.',
+],
+[
+'src' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1600&auto=format&fit=crop',
+'title' => 'Creative Portrait',
+'description' => 'Stylized and conceptual portraits for artists and creatives.',
+],
+[
+'src' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1600&auto=format&fit=crop',
+'title' => 'Environmental Portrait',
+'description' => 'Photos that show personality in context — workplace, studio or outdoors.',
+],
+];
+
+// Use gallery from backend if exists, else use default
+$galleryImages = [];
+
+if (!empty($gallery) && count($gallery) > 0) {
+foreach ($gallery as $imgPath) {
+$galleryImages[] = [
+'src' => asset('storage/'.$imgPath),
+'title' => '', // you can optionally add title
+'description' => '', // optionally add description
+];
+}
+} else {
+$galleryImages = $defaultGallery;
+}
+
+
+
+/* ===========================
+SERVICES
+=========================== */
+$defaultServices = [
+[
+'icon' => 'bi bi-camera-fill',
+'title' => 'Professional Studio Setup',
+'description' => 'Full studio environment with lights, backdrops, and makeup coordination.',
+],
+[
+'icon' => 'bi bi-people-fill',
+'title' => 'Personalized Sessions',
+'description' => 'Pre-shoot consultation with wardrobe and mood planning.',
+],
+[
+'icon' => 'bi bi-brush-fill',
+'title' => 'Advanced Retouching',
+'description' => 'Professional skin retouching and color grading.',
+],
+];
+
+$services = ($portrait && !empty($portrait->services))
+? $portrait->services
+: $defaultServices;
+
+
+/* ===========================
+TESTIMONIALS
+=========================== */
+$defaultTestimonials = [
+[
+'text' => 'Working with Unimax changed my portfolio — the craft was outstanding.',
+'author' => 'Naomi A., Creative Director',
+],
+[
+'text' => 'Excellent studio environment. The images exceeded my expectations.',
+'author' => 'Michael R., Actor',
+],
+];
+
+$testimonials = ($portrait && !empty($portrait->testimonials))
+? $portrait->testimonials
+: $defaultTestimonials;
+
+
+/* ===========================
+STATS
+=========================== */
+$defaultStats = [
+['value' => '0', 'title' => 'Client Reviews'],
+['value' => '0', 'title' => 'Support Team'],
+['value' => '0', 'title' => 'Projects Completed'],
+['value' => '0', 'title' => 'Years Experience'],
+];
+
+$stats = ($portrait && !empty($portrait->stats))
+? $portrait->stats
+: $defaultStats;
+
+
+/* ===========================
+HERO TEXT
+=========================== */
+$heroTitle = ($portrait && $portrait->title)
+? $portrait->title
+: 'Portrait Photography — Capture Personality & Presence';
+
+$heroDescription = ($portrait && $portrait->description)
+? $portrait->description
+: 'Professional portrait sessions for individuals, families, and talent.';
+
+$ctaTitle = ($portrait && $portrait->cta_title)
+? $portrait->cta_title
+: 'Ready for your portrait session?';
+
+$ctaDescription = ($portrait && $portrait->cta_description)
+? $portrait->cta_description
+: 'Book an in-studio or on-location session tailored to you.';
+@endphp
+
+
 @section('content')
 <!-- ============= HERO ============= -->
 <section class="portrait-hero" aria-labelledby="portrait-hero-heading"
     style="background: linear-gradient(120deg, var(--deep-rose), var(--rose)),
-            url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1200&auto=format&fit=crop') center/cover;">
+            url('{{ $heroBg }}') center/cover;">
     <div class="inner">
         <div class="hero-left" role="region" aria-label="Introduction">
-            <h1 id="portrait-hero-heading">Portrait Photography — Capture Personality & Presence</h1>
-            <p>Professional portrait sessions for individuals, families, and talent. We craft lighting, pose, and mood so your photographs speak with confidence — editorial, corporate, lifestyle, or creative portraits.</p>
+            <h1 id="portrait-hero-heading">{{ $heroTitle }}</h1>
+            <p>{{ $heroDescription }}</p>
+
             <div class="hero-cta">
-                <a href="{{ route('contact') }}" class="btn-primary-hero" aria-label="Book portrait session">
+                <a href="{{ route('contact') }}" class="btn-primary-hero">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:6px">
                         <path d="M22 12L2 3v18L22 12z" fill="white" />
                     </svg>
@@ -26,107 +171,91 @@
             </div>
         </div>
 
-        <div class="hero-right" aria-hidden="false">
-            <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1200&auto=format&fit=crop" alt="Portrait hero preview" loading="lazy">
+        <div class="hero-right" style="flex:1; max-width:600px; height:75vh; overflow:hidden; display:flex; align-items:flex-start;">
+            <img src="{{ $heroRight }}"
+                alt="Portrait hero preview"
+                loading="lazy"
+                style="width:100%; height:100%; object-fit:cover; object-position:top;">
         </div>
+
     </div>
 </section>
 
+
+
 <div class="page-container" id="portfolio">
 
-    <!-- ============= SLIDER ============= -->
-    <section aria-label="Portrait Gallery" style="margin-top: 5rem">
-        <div class="slider" id="portraitSlider" role="region" aria-roledescription="carousel" aria-label="Portrait images carousel">
-            <div class="slider-main" id="sliderMain">
-                <!-- Slides: replace src urls with your image assets -->
-                <div class="slide active" data-index="0" tabindex="0" aria-hidden="false">
-                    <img src="https://images.unsplash.com/photo-1524503033411-c9566986fc8f?q=80&w=1600&auto=format&fit=crop" alt="Portrait 1" loading="lazy">
-                    <div class="caption">
-                        <h4>Studio Portrait</h4>
-                        <p>Classic lighting, refined look for headshots and editorial portraits.</p>
+    <!-- ============= GALLERY SLIDER ============= -->
+    <section aria-label="Portrait Gallery" style="margin-top: 5rem;">
+        <div class="slider" id="portraitSlider" style="max-width:1200px; margin:0 auto;">
+            <div class="slider-main" id="sliderMain" style="position:relative; height:80vh; overflow:hidden; background:#fff;">
+
+                <!-- Slides -->
+                @foreach($galleryImages as $index => $img)
+                <div class="slide"
+                    data-index="{{ $index }}"
+                    tabindex="{{ $index === 0 ? '0' : '-1' }}"
+                    aria-hidden="{{ $index === 0 ? 'false' : 'true' }}"
+                    style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:{{ $index === 0 ? '1' : '0' }}; transition:opacity 0.4s; text-align:center; background:#fff;">
+                    <img src="{{ $img['src'] }}"
+                        alt="{{ $img['title'] }}"
+                        loading="lazy"
+                        class="zoomable"
+                        style="width:auto; max-width:90%; max-height:80vh; object-fit:contain; display:inline-block; margin:0 auto; transition: transform 0.2s; cursor:grab;">
+                    <div class="caption" style="margin-top:1rem; text-align:center;">
+                        <h4 style="margin:0 0 0.5rem 0;">{{ $img['title'] }}</h4>
+                        <p style="margin:0; color:#555;">{{ $img['description'] }}</p>
                     </div>
                 </div>
+                @endforeach
 
-                <div class="slide" data-index="1" tabindex="-1" aria-hidden="true">
-                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1600&auto=format&fit=crop" alt="Portrait 2" loading="lazy">
-                    <div class="caption">
-                        <h4>Outdoor Portrait</h4>
-                        <p>Natural light and environmental storytelling.</p>
-                    </div>
+                <!-- Slider controls -->
+                <div class="slider-controls" style="position:absolute; top:50%; left:0; right:0; display:flex; justify-content:space-between; transform:translateY(-50%);">
+                    <button id="prevBtn" style="background:#fff; border:none; padding:0.5rem 1rem; cursor:pointer; border-radius:5px;">◀</button>
+                    <button id="nextBtn" style="background:#fff; border:none; padding:0.5rem 1rem; cursor:pointer; border-radius:5px;">▶</button>
                 </div>
 
-                <div class="slide" data-index="2" tabindex="-1" aria-hidden="true">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1600&auto=format&fit=crop" alt="Portrait 3" loading="lazy">
-                    <div class="caption">
-                        <h4>Creative Portrait</h4>
-                        <p>Stylized and conceptual portraits for artists and creatives.</p>
-                    </div>
+                <!-- Zoom controls -->
+                <div class="zoom-controls" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:0.5rem;">
+                    <button id="zoomIn" style="background:#fff; border:none; padding:0.3rem 0.6rem; cursor:pointer; border-radius:5px;">Zoom +</button>
+                    <button id="zoomOut" style="background:#fff; border:none; padding:0.3rem 0.6rem; cursor:pointer; border-radius:5px;">Zoom -</button>
                 </div>
 
-                <div class="slide" data-index="3" tabindex="-1" aria-hidden="true">
-                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1600&auto=format&fit=crop" alt="Portrait 4" loading="lazy">
-                    <div class="caption">
-                        <h4>Environmental Portrait</h4>
-                        <p>Photos that show personality in context — workplace, studio or outdoors.</p>
-                    </div>
-                </div>
-
-                <!-- slider controls -->
-                <div class="slider-controls" aria-hidden="false">
-                    <button id="prevBtn" title="Previous (Left arrow)">◀</button>
-                    <button id="nextBtn" title="Next (Right arrow)">▶</button>
-                </div>
-
-                <div class="autoplay-indicator" id="autoplayIndicator">Auto • On</div>
+                <div class="autoplay-indicator" style="position:absolute; bottom:10px; right:10px; background:rgba(255,255,255,0.8); padding:0.2rem 0.5rem; border-radius:5px; font-size:0.9rem;">Auto • On</div>
             </div>
 
-            <!-- Thumbnails column -->
-            <aside class="slider-thumbs" aria-label="Gallery thumbnails">
-                <div class="thumb active" data-index="0" tabindex="0" aria-pressed="true" role="button" aria-label="Show slide 1">
-                    <img src="https://images.unsplash.com/photo-1524503033411-c9566986fc8f?q=80&w=800&auto=format&fit=crop" alt="Thumb 1" loading="lazy">
-                </div>
-                <div class="thumb" data-index="1" tabindex="0" role="button" aria-label="Show slide 2">
-                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop" alt="Thumb 2" loading="lazy">
-                </div>
-                <div class="thumb" data-index="2" tabindex="0" role="button" aria-label="Show slide 3">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop" alt="Thumb 3" loading="lazy">
-                </div>
-                <div class="thumb" data-index="3" tabindex="0" role="button" aria-label="Show slide 4">
-                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop" alt="Thumb 4" loading="lazy">
+            <!-- Thumbnails with pagination -->
+            <aside class="slider-thumbs" style="display:flex; flex-direction:column; align-items:center; margin-top:1rem;">
+                <div id="thumbsContainer" style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;"></div>
+
+                <div id="thumbPagination" style="margin-top:0.5rem;">
+                    <button id="prevThumbs" style="padding:0.3rem 0.6rem; margin-right:0.3rem;">◀</button>
+                    <button id="nextThumbs" style="padding:0.3rem 0.6rem;">▶</button>
                 </div>
             </aside>
+
         </div>
     </section>
 
     <!-- ============= SERVICES ============= -->
-    <section class="services-grid" aria-label="What we offer">
-        <div class="service" role="article">
-            <i class="bi bi-camera-fill" aria-hidden="true"></i>
-            <h4>Professional Studio Setup</h4>
-            <p>Full studio environment with multiple lighting setups, premium backdrops, and hair/makeup coordination if required.</p>
+    <section class="services-grid">
+        @foreach($services as $srv)
+        <div class="service">
+            <i class="{{ $srv['icon'] }}"></i>
+            <h4>{{ $srv['title'] }}</h4>
+            <p>{{ $srv['description'] }}</p>
         </div>
-        <div class="service" role="article">
-            <i class="bi bi-people-fill" aria-hidden="true"></i>
-            <h4>Personalized Sessions</h4>
-            <p>We plan each session with a pre-shoot consultation to tailor lighting, wardrobe guidance, and mood for your goals.</p>
-        </div>
-        <div class="service" role="article">
-            <i class="bi bi-brush-fill" aria-hidden="true"></i>
-            <h4>Advanced Retouching</h4>
-            <p>Professional skin retouching, color grading, and multiple delivery formats for print and web.</p>
-        </div>
+        @endforeach
     </section>
 
     <!-- ============= TESTIMONIALS ============= -->
-    <section class="testimonials" aria-label="Client testimonials">
-        <div class="testimonial" role="article">
-            <p>"Working with Unimax changed my portfolio — the level of craft and direction was outstanding."</p>
-            <div class="who">— Naomi A., Creative Director</div>
+    <section class="testimonials">
+        @foreach($testimonials as $tm)
+        <div class="testimonial">
+            <p>"{{ $tm['text'] }}"</p>
+            <div class="who">— {{ $tm['author'] }}</div>
         </div>
-        <div class="testimonial" role="article">
-            <p>"Excellent studio environment and direction. The images delivered exceeded my expectations."</p>
-            <div class="who">— Michael R., Actor</div>
-        </div>
+        @endforeach
     </section>
 
     <!-- ============= STATS & CTA ============= -->
@@ -149,13 +278,14 @@
         </div>
     </section>
 
-    <section class="cta" role="region" aria-label="Call to action">
+    <!-- ============= CTA ============= -->
+    <section class="cta">
         <div class="left">
-            <h3>Ready for your portrait session?</h3>
-            <p>Book an in-studio or on-location session. We’ll prepare a tailored plan and guide you through wardrobe, pose, and expression to capture your best self.</p>
+            <h3>{{ $ctaTitle }}</h3>
+            <p>{{ $ctaDescription }}</p>
         </div>
         <div class="right">
-            <a href="{{ route('contact') }}" class="cta-btn" aria-label="Contact us to book">Contact & Book</a>
+            <a href="{{ route('contact') }}" class="cta-btn">Contact & Book</a>
         </div>
     </section>
 
@@ -164,4 +294,68 @@
 
 @push('scripts')
 <script src="{{ asset('js/public/photography/portrait.js') }}"></script>
+
+<script>
+    const allThumbs = @json($galleryImages);
+    const thumbsPerPage = 5;
+    let currentThumbPage = 0;
+
+    const thumbsContainer = document.getElementById('thumbsContainer');
+
+    function renderThumbs() {
+        thumbsContainer.innerHTML = '';
+        const start = currentThumbPage * thumbsPerPage;
+        const end = start + thumbsPerPage;
+        const pageThumbs = allThumbs.slice(start, end);
+
+        pageThumbs.forEach((img, index) => {
+            const thumbDiv = document.createElement('div');
+            thumbDiv.className = 'thumb';
+            thumbDiv.dataset.index = start + index;
+            thumbDiv.tabIndex = 0;
+            thumbDiv.role = 'button';
+            thumbDiv.style.width = '150px';
+            thumbDiv.style.height = '100px';
+            thumbDiv.style.overflow = 'hidden';
+            thumbDiv.style.cursor = 'pointer';
+            thumbDiv.style.border = (start + index === 0) ? '2px solid #000' : '2px solid transparent';
+            thumbDiv.style.borderRadius = '5px';
+            thumbDiv.style.display = 'flex';
+            thumbDiv.style.alignItems = 'flex-start'; // ensures image is mostly at the top
+
+            const thumbImg = document.createElement('img');
+            thumbImg.src = img.src;
+            thumbImg.alt = img.title;
+            thumbImg.loading = 'lazy';
+            thumbImg.style.width = '100%';
+            thumbImg.style.height = '100%';
+            thumbImg.style.objectFit = 'cover';
+            thumbImg.style.objectPosition = 'top'; // top alignment
+            thumbImg.style.display = 'block';
+
+            thumbDiv.appendChild(thumbImg);
+
+            // Click to show main slide
+            thumbDiv.addEventListener('click', () => showSlide(start + index));
+
+            thumbsContainer.appendChild(thumbDiv);
+        });
+    }
+
+    document.getElementById('prevThumbs').addEventListener('click', () => {
+        if (currentThumbPage > 0) {
+            currentThumbPage--;
+            renderThumbs();
+        }
+    });
+
+    document.getElementById('nextThumbs').addEventListener('click', () => {
+        if ((currentThumbPage + 1) * thumbsPerPage < allThumbs.length) {
+            currentThumbPage++;
+            renderThumbs();
+        }
+    });
+
+    renderThumbs(); // initial render
+</script>
 @endpush

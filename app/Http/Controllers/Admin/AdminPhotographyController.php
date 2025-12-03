@@ -18,7 +18,8 @@ use App\Models\TiktokSchoolMediaShoots;
 
 class AdminPhotographyController extends Controller
 {
-    // === 1. PORTRAIT PHOTOGRAPHY ===
+    // === PORTRAIT PHOTOGRAPHY ===
+
     public function portraitIndex()
     {
         $portraits = PortraitPhotography::all();
@@ -32,9 +33,28 @@ class AdminPhotographyController extends Controller
 
     public function portraitStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        PortraitPhotography::create($request->all());
-        return redirect()->route('admin.photography.portrait.index')->with('success', 'Portrait photography added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120', // max 5MB
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        // Upload hero images
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('portraits', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('portraits', 'public');
+        }
+
+        PortraitPhotography::create($data);
+
+        return redirect()->route('admin.photography.portrait.index')
+            ->with('success', 'Portrait photography added successfully.');
     }
 
     public function portraitEdit(PortraitPhotography $portrait)
@@ -44,17 +64,105 @@ class AdminPhotographyController extends Controller
 
     public function portraitUpdate(Request $request, PortraitPhotography $portrait)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $portrait->update($request->all());
-        return redirect()->route('admin.photography.portrait.index')->with('success', 'Portrait photography updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        // Upload hero images
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('portraits', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('portraits', 'public');
+        }
+
+        $portrait->update($data);
+
+        return redirect()->route('admin.photography.portrait.index')
+            ->with('success', 'Portrait photography updated successfully.');
     }
 
     public function portraitDestroy(PortraitPhotography $portrait)
     {
+        // Delete hero images from storage
+        if ($portrait->hero_image) {
+            \Storage::disk('public')->delete($portrait->hero_image);
+        }
+        if ($portrait->hero_right_image) {
+            \Storage::disk('public')->delete($portrait->hero_right_image);
+        }
+
         $portrait->delete();
-        return redirect()->route('admin.photography.portrait.index')->with('success', 'Portrait photography deleted successfully.');
+
+        return redirect()->route('admin.photography.portrait.index')
+            ->with('success', 'Portrait photography deleted successfully.');
     }
 
+    // === GALLERY MANAGEMENT ===
+
+    // Show gallery for a portrait or independent gallery
+    public function portraitGallery($portraitId)
+    {
+        $portrait = null;
+        if ($portraitId != 0) {
+            $portrait = PortraitPhotography::findOrFail($portraitId);
+        }
+
+        return view('admin.photography.portrait.gallery', compact('portrait'));
+    }
+
+    public function portraitGalleryStore(Request $request, $portraitId)
+    {
+        // Ensure a portrait is selected
+        if ($portraitId == 0) {
+            return redirect()->back()->with('error', 'Please select a portrait to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120', // 5MB max per image
+        ]);
+
+        $portrait = PortraitPhotography::findOrFail($portraitId);
+
+        // Existing gallery or empty array
+        $gallery = $portrait->gallery ?? [];
+
+        // Append all uploaded images
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('portraits', 'public');
+            }
+        } else {
+            return redirect()->back()->with('error', 'No images selected for upload.');
+        }
+
+        $portrait->gallery = $gallery;
+        $portrait->save();
+
+        return redirect()->route('admin.photography.portrait.gallery', $portrait)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function portraitGalleryDestroy(PortraitPhotography $portrait, $index)
+    {
+        $gallery = $portrait->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1); // remove image
+            $portrait->gallery = $gallery;
+            $portrait->save();
+        }
+
+        return redirect()->route('admin.photography.portrait.gallery', $portrait)
+            ->with('success', 'Gallery image deleted successfully.');
+    }
 
 
     // === 2. FAMILY PHOTOGRAPHY ===

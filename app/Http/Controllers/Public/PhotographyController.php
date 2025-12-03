@@ -3,13 +3,20 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\PortraitPhotography;
 
 class PhotographyController extends Controller
 {
     public function portrait()
     {
-        return view('public.photography.portrait');
+        $portrait = PortraitPhotography::first();
+
+        // Use backend gallery if exists, else empty array
+        $gallery = $portrait && !empty($portrait->gallery) ? $portrait->gallery : [];
+
+        return view('public.photography.portrait', compact('portrait', 'gallery'));
     }
+
     public function family()
     {
         return view('public.photography.family');

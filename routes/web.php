@@ -162,6 +162,25 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('admin/photography/portrait/{portrait}', [AdminPhotographyController::class, 'portraitUpdate'])->name('admin.photography.portrait.update');
     Route::delete('admin/photography/portrait/{portrait}', [AdminPhotographyController::class, 'portraitDestroy'])->name('admin.photography.portrait.destroy');
 
+    // === PORTRAIT GALLERY MANAGEMENT ===
+    Route::get(
+        'admin/photography/portrait/{portrait}/gallery',
+        [AdminPhotographyController::class, 'portraitGallery']
+    )
+        ->name('admin.photography.portrait.gallery');
+
+    Route::post(
+        'admin/photography/portrait/{portrait}/gallery',
+        [AdminPhotographyController::class, 'portraitGalleryStore']
+    )
+        ->name('admin.photography.portrait.gallery.store');
+
+    Route::delete(
+        'admin/photography/portrait/{portrait}/gallery/{index}',
+        [AdminPhotographyController::class, 'portraitGalleryDestroy']
+    )
+        ->name('admin.photography.portrait.gallery.destroy');
+
 
     // === 2. FAMILY PHOTOGRAPHY ===
     Route::get('admin/photography/family', [AdminPhotographyController::class, 'familyIndex'])->name('admin.photography.family.index');

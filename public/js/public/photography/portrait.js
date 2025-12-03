@@ -1,4 +1,4 @@
-(function () {
+document.addEventListener("DOMContentLoaded", () => {
     const slider = document.getElementById("portraitSlider");
     if (!slider) return;
 
@@ -6,144 +6,142 @@
     const thumbs = Array.from(slider.querySelectorAll(".thumb"));
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
-    const autoplayIndicator = document.getElementById("autoplayIndicator");
+    const zoomInBtn = document.getElementById("zoomIn");
+    const zoomOutBtn = document.getElementById("zoomOut");
+    const autoplayIndicator = document.querySelector(".autoplay-indicator");
 
-    let idx = 0;
-    let autoplay = true;
-    let autoplayInterval = 4500;
-    let timer = null;
+    let currentIndex = 0;
+    let currentScale = 1;
+    let zoomDirection = 1;
+    const maxZoom = 1.2;
+    const minZoom = 1;
+    const zoomSpeed = 0.002;
+    const slideDuration = 7000;
+    let slideTimer = null;
 
-    function showSlide(newIndex) {
-        if (newIndex < 0) newIndex = slides.length - 1;
-        if (newIndex >= slides.length) newIndex = 0;
-        slides.forEach((s, i) => {
-            const isActive = i === newIndex;
-            s.classList.toggle("active", isActive);
-            s.setAttribute("aria-hidden", !isActive);
-            s.tabIndex = isActive ? 0 : -1;
+    // Preload images
+    slides.forEach((slide) => {
+        const img = slide.querySelector("img.zoomable");
+        const pre = new Image();
+        pre.src = img.src;
+    });
+
+    function showSlide(index) {
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
+        slides.forEach((slide, i) => {
+            const isActive = i === index;
+            slide.style.opacity = isActive ? 1 : 0;
+            slide.setAttribute("aria-hidden", !isActive);
+            slide.tabIndex = isActive ? 0 : -1;
+            slide.querySelector("img.zoomable").style.transform = "scale(1)";
         });
         thumbs.forEach((t, i) => {
-            t.classList.toggle("active", i === newIndex);
-            t.setAttribute("aria-pressed", i === newIndex ? "true" : "false");
+            t.style.border =
+                i === index ? "2px solid #000" : "2px solid transparent";
+            t.setAttribute("aria-pressed", i === index ? "true" : "false");
         });
-        idx = newIndex;
+        currentIndex = index;
+        currentScale = 1;
+        zoomDirection = 1;
+        resetSlideTimer();
     }
 
-    function next() {
-        showSlide(idx + 1);
+    function nextSlide() {
+        showSlide(currentIndex + 1);
     }
 
-    function prev() {
-        showSlide(idx - 1);
+    function prevSlide() {
+        showSlide(currentIndex - 1);
     }
 
-    function startAutoplay() {
-        if (timer) clearInterval(timer);
-        timer = setInterval(next, autoplayInterval);
-        autoplay = true;
-        autoplayIndicator.textContent = "Auto • On";
+    function resetSlideTimer() {
+        clearTimeout(slideTimer);
+        slideTimer = setTimeout(nextSlide, slideDuration);
     }
 
-    function stopAutoplay() {
-        if (timer) clearInterval(timer);
-        timer = null;
-        autoplay = false;
-        autoplayIndicator.textContent = "Auto • Off";
+    // Zoom handling
+    function updateZoom() {
+        const img = slides[currentIndex].querySelector("img.zoomable");
+        img.style.transform = `scale(${currentScale})`;
     }
 
-    // init listeners
-    nextBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        next();
-        stopAutoplay();
+    zoomInBtn.addEventListener("click", () => {
+        currentScale = Math.min(maxZoom, currentScale + 0.2);
+        updateZoom();
     });
-    prevBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        prev();
-        stopAutoplay();
+    zoomOutBtn.addEventListener("click", () => {
+        currentScale = Math.max(minZoom, currentScale - 0.2);
+        updateZoom();
     });
 
-    thumbs.forEach((t) => {
-        const i = parseInt(t.dataset.index, 10);
-        t.addEventListener("click", () => {
-            showSlide(i);
-            stopAutoplay();
+    slides.forEach((slide) => {
+        const img = slide.querySelector("img.zoomable");
+        slide.addEventListener("wheel", (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0)
+                currentScale = Math.min(maxZoom, currentScale + 0.05);
+            else currentScale = Math.max(minZoom, currentScale - 0.05);
+            img.style.transform = `scale(${currentScale})`;
         });
-        t.addEventListener("keydown", (ev) => {
+    });
+
+    // Auto zoom oscillation
+    function autoZoom() {
+        const img = slides[currentIndex].querySelector("img.zoomable");
+        currentScale += zoomSpeed * zoomDirection;
+        if (currentScale >= maxZoom) zoomDirection = -1;
+        if (currentScale <= minZoom) zoomDirection = 1;
+        img.style.transform = `scale(${currentScale})`;
+        requestAnimationFrame(autoZoom);
+    }
+    autoZoom();
+
+    // Slider controls
+    nextBtn.addEventListener("click", nextSlide);
+    prevBtn.addEventListener("click", prevSlide);
+
+    thumbs.forEach((thumb, i) => {
+        thumb.addEventListener("click", () => showSlide(i));
+        thumb.addEventListener("keydown", (ev) => {
             if (ev.key === "Enter" || ev.key === " ") {
                 ev.preventDefault();
                 showSlide(i);
-                stopAutoplay();
             }
         });
     });
 
-    slider.addEventListener("mouseenter", () => {
-        stopAutoplay();
-    });
-    slider.addEventListener("mouseleave", () => {
-        startAutoplay();
-    });
+    slider.addEventListener("mouseenter", () => clearTimeout(slideTimer));
+    slider.addEventListener("mouseleave", resetSlideTimer);
 
     document.addEventListener("keydown", (ev) => {
-        if (ev.key === "ArrowRight") {
-            next();
-            stopAutoplay();
-        }
-        if (ev.key === "ArrowLeft") {
-            prev();
-            stopAutoplay();
-        }
+        if (ev.key === "ArrowRight") nextSlide();
+        if (ev.key === "ArrowLeft") prevSlide();
     });
 
-    // Responsive: pause autoplay on small devices to save CPU/memory if desired
-    function handleVisibility() {
-        if (document.hidden) stopAutoplay();
-        else startAutoplay();
+    // Autoplay indicator toggle
+    if (autoplayIndicator) {
+        autoplayIndicator.addEventListener("click", () => {
+            if (slideTimer) clearTimeout(slideTimer);
+            else resetSlideTimer();
+        });
     }
-    document.addEventListener("visibilitychange", handleVisibility);
 
-    // kick off
+    // Initialize first slide
     showSlide(0);
-    startAutoplay();
 
-    // lazy-resize slides on load/resize for canvas-like layout (if you add dynamic sizes)
-    window.addEventListener("resize", () => {
-        // placeholder for any responsive adjustments
-    });
-
-    // make autoplay indicator clickable to toggle
-    autoplayIndicator.addEventListener("click", () => {
-        if (autoplay) stopAutoplay();
-        else startAutoplay();
-    });
-})();
-
-/* ===== Counters that animate when in view ===== */
-(function () {
+    // ===== STATS COUNTER =====
     const counters = [
-        {
-            id: "statClients",
-            target: 500,
-        },
-        {
-            id: "statTeam",
-            target: 50,
-        },
-        {
-            id: "statProjects",
-            target: 3000,
-        },
-        {
-            id: "statYears",
-            target: 15,
-        },
+        { id: "statClients", target: 500 },
+        { id: "statTeam", target: 50 },
+        { id: "statProjects", target: 3000 },
+        { id: "statYears", target: 15 },
     ];
     const duration = 1700;
+    let startedStats = false;
 
     function animateValue(el, start, end, duration) {
         let startTime = null;
-
         function step(timestamp) {
             if (!startTime) startTime = timestamp;
             const progress = Math.min((timestamp - startTime) / duration, 1);
@@ -155,10 +153,8 @@
         requestAnimationFrame(step);
     }
 
-    let started = false;
-
-    function checkStart() {
-        if (started) return;
+    function checkStats() {
+        if (startedStats) return;
         const section = document.querySelector(".stats-row");
         if (!section) return;
         const rect = section.getBoundingClientRect();
@@ -167,12 +163,11 @@
                 const el = document.getElementById(c.id);
                 if (el) animateValue(el, 0, c.target, duration);
             });
-            started = true;
-            window.removeEventListener("scroll", checkStart);
+            startedStats = true;
         }
     }
-    window.addEventListener("scroll", checkStart);
-    window.addEventListener("load", checkStart);
-    // also trigger initially in case it's already visible
-    setTimeout(checkStart, 300);
-})();
+
+    window.addEventListener("scroll", checkStats);
+    window.addEventListener("load", checkStats);
+    setTimeout(checkStats, 300);
+});

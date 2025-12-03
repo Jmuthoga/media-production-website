@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\InternshipAttachment;
 use App\Models\OurStoryMission;
 use App\Models\OurStoryClient;
 
@@ -32,7 +33,14 @@ class AboutUsController extends Controller
         $stats = collect($pageMeta['stats'] ?? []);
 
         return view('public.aboutus.our-story', compact(
-            'hero', 'heroMeta', 'page', 'pageMeta', 'stats', 'faq', 'faqMeta', 'clients'
+            'hero',
+            'heroMeta',
+            'page',
+            'pageMeta',
+            'stats',
+            'faq',
+            'faqMeta',
+            'clients'
         ));
     }
 
@@ -46,7 +54,7 @@ class AboutUsController extends Controller
         return view('public.aboutus.careers');
     }
 
-   public function internships()
+    public function internships()
     {
         $items = InternshipAttachment::orderBy('type')->orderBy('id')->get();
 
@@ -73,8 +81,13 @@ class AboutUsController extends Controller
         $requirements = $items->where('type', 'requirement')->values();
 
         return view('public.aboutus.internships', compact(
-            'hero', 'page', 'stats', 'videoId', 'roles', 'offers', 'requirements'
+            'hero',
+            'page',
+            'stats',
+            'videoId',
+            'roles',
+            'offers',
+            'requirements'
         ));
     }
-
 }
