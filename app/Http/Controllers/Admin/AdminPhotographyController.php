@@ -321,34 +321,148 @@ class AdminPhotographyController extends Controller
         return view('admin.photography.studio.index', compact('studios'));
     }
 
+    // Show create form
     public function studioCreate()
     {
         return view('admin.photography.studio.create');
     }
 
+    // Store new studio entry
     public function studioStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        StudioSessionHire::create($request->all());
-        return redirect()->route('admin.photography.studio.index')->with('success', 'Studio session added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('studio', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('studio', 'public');
+        }
+
+        StudioSessionHire::create($data);
+
+        return redirect()->route('admin.photography.studio.index')
+            ->with('success', 'Studio photography added successfully.');
     }
 
+    // Show edit form
     public function studioEdit(StudioSessionHire $studio)
     {
         return view('admin.photography.studio.edit', compact('studio'));
     }
 
+    // Update studio entry
     public function studioUpdate(Request $request, StudioSessionHire $studio)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $studio->update($request->all());
-        return redirect()->route('admin.photography.studio.index')->with('success', 'Studio session updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('studio', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('studio', 'public');
+        }
+
+        $studio->update($data);
+
+        return redirect()->route('admin.photography.studio.index')
+            ->with('success', 'Studio photography updated successfully.');
     }
 
+    // Delete studio entry
     public function studioDestroy(StudioSessionHire $studio)
     {
+        if ($studio->hero_image) {
+            \Storage::disk('public')->delete($studio->hero_image);
+        }
+
+        if ($studio->hero_right_image) {
+            \Storage::disk('public')->delete($studio->hero_right_image);
+        }
+
+        if ($studio->gallery) {
+            foreach ($studio->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $studio->delete();
-        return redirect()->route('admin.photography.studio.index')->with('success', 'Studio session deleted successfully.');
+
+        return redirect()->route('admin.photography.studio.index')
+            ->with('success', 'Studio photography deleted successfully.');
+    }
+
+    // === STUDIO GALLERY MANAGEMENT ===
+
+    // Show gallery page
+    public function studioGallery($studioId)
+    {
+        $studio = null;
+        if ($studioId != 0) {
+            $studio = StudioSessionHire::findOrFail($studioId);
+        }
+
+        return view('admin.photography.studio.gallery', compact('studio'));
+    }
+
+    // Add images to gallery
+    public function studioGalleryStore(Request $request, $studioId)
+    {
+        if ($studioId == 0) {
+            return redirect()->back()->with('error', 'Please select a studio entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $studio = StudioSessionHire::findOrFail($studioId);
+
+        $gallery = $studio->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('studio/gallery', 'public');
+            }
+        }
+
+        $studio->gallery = $gallery;
+        $studio->save();
+
+        return redirect()->route('admin.photography.studio.gallery', $studio)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    // Delete gallery image
+    public function studioGalleryDestroy(StudioSessionHire $studio, $index)
+    {
+        $gallery = $studio->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $studio->gallery = $gallery;
+            $studio->save();
+        }
+
+        return redirect()->route('admin.photography.studio.gallery', $studio)
+            ->with('success', 'Gallery image deleted successfully.');
     }
 
 

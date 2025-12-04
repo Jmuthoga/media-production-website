@@ -200,6 +200,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('admin/photography/studio/{studio}', [AdminPhotographyController::class, 'studioUpdate'])->name('admin.photography.studio.update');
     Route::delete('admin/photography/studio/{studio}', [AdminPhotographyController::class, 'studioDestroy'])->name('admin.photography.studio.destroy');
 
+    // === STUDIO GALLERY MANAGEMENT ===
+    Route::get('admin/photography/studio/{studio}/gallery', [AdminPhotographyController::class, 'studioGallery'])
+        ->name('admin.photography.studio.gallery');
+
+    Route::post('admin/photography/studio/{studio}/gallery', [AdminPhotographyController::class, 'studioGalleryStore'])
+        ->name('admin.photography.studio.gallery.store');
+
+    Route::delete('admin/photography/studio/{studio}/gallery/{index}', [AdminPhotographyController::class, 'studioGalleryDestroy'])
+        ->name('admin.photography.studio.gallery.destroy');
+
 
     // === 4. WEDDINGS & ENGAGEMENTS ===
     Route::get('admin/photography/weddings', [AdminPhotographyController::class, 'weddingsIndex'])->name('admin.photography.weddings.index');
