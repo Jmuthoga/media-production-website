@@ -18,7 +18,7 @@ use App\Models\TiktokSchoolMediaShoots;
 
 class AdminPhotographyController extends Controller
 {
-    // === PORTRAIT PHOTOGRAPHY ===
+    // ===1. PORTRAIT PHOTOGRAPHY ===
 
     public function portraitIndex()
     {
@@ -172,35 +172,145 @@ class AdminPhotographyController extends Controller
         return view('admin.photography.family.index', compact('families'));
     }
 
+    // Create family entry
     public function familyCreate()
     {
         return view('admin.photography.family.create');
     }
 
+    // Store family hero section
     public function familyStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        FamilyPhotography::create($request->all());
-        return redirect()->route('admin.photography.family.index')->with('success', 'Family photography added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('family', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('family', 'public');
+        }
+
+        FamilyPhotography::create($data);
+
+        return redirect()->route('admin.photography.family.index')
+            ->with('success', 'Family photography added successfully.');
     }
 
+    // Edit page
     public function familyEdit(FamilyPhotography $family)
     {
         return view('admin.photography.family.edit', compact('family'));
     }
 
+    // Update hero section
     public function familyUpdate(Request $request, FamilyPhotography $family)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $family->update($request->all());
-        return redirect()->route('admin.photography.family.index')->with('success', 'Family photography updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('family', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('family', 'public');
+        }
+
+        $family->update($data);
+
+        return redirect()->route('admin.photography.family.index')
+            ->with('success', 'Family photography updated successfully.');
     }
 
+    // Delete a full record
     public function familyDestroy(FamilyPhotography $family)
     {
+        if ($family->hero_image) {
+            \Storage::disk('public')->delete($family->hero_image);
+        }
+        if ($family->hero_right_image) {
+            \Storage::disk('public')->delete($family->hero_right_image);
+        }
+
+        if ($family->gallery) {
+            foreach ($family->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $family->delete();
-        return redirect()->route('admin.photography.family.index')->with('success', 'Family photography deleted successfully.');
+
+        return redirect()->route('admin.photography.family.index')
+            ->with('success', 'Family photography deleted successfully.');
     }
+
+    // === FAMILY GALLERY MANAGEMENT ===
+    public function familyGallery($familyId)
+    {
+        $family = null;
+        if ($familyId != 0) {
+            $family = FamilyPhotography::findOrFail($familyId);
+        }
+
+        return view('admin.photography.family.gallery', compact('family'));
+    }
+
+    public function familyGalleryStore(Request $request, $familyId)
+    {
+        if ($familyId == 0) {
+            return redirect()->back()->with('error', 'Please select a family entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $family = FamilyPhotography::findOrFail($familyId);
+
+        $gallery = $family->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('family/gallery', 'public');
+            }
+        }
+
+        $family->gallery = $gallery;
+        $family->save();
+
+        return redirect()->route('admin.photography.family.gallery', $family)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function familyGalleryDestroy(FamilyPhotography $family, $index)
+    {
+        $gallery = $family->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $family->gallery = $gallery;
+            $family->save();
+        }
+
+        return redirect()->route('admin.photography.family.gallery', $family)
+            ->with('success', 'Gallery image deleted successfully.');
+    }
+
 
 
 

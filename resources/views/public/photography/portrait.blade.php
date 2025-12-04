@@ -227,13 +227,41 @@ $ctaDescription = ($portrait && $portrait->cta_description)
             <!-- Thumbnails with pagination -->
             <aside class="slider-thumbs" style="display:flex; flex-direction:column; align-items:center; margin-top:1rem;">
                 <div id="thumbsContainer" style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;"></div>
+                <div id="thumbPagination" style="margin-top:0.5rem; display:flex; gap:0.5rem; justify-content:center;">
+                    <button id="prevThumbs"
+                        style="
+                                padding:0.4rem 0.9rem;
+                                background:#1a1a1a;
+                                color:#fff;
+                                border:none;
+                                border-radius:6px;
+                                font-size:1rem;
+                                cursor:pointer;
+                                box-shadow:0 2px 6px rgba(0,0,0,0.2);
+                                transition:0.2s;
+                            "
+                        onmouseover="this.style.background='#000'"
+                        onmouseout="this.style.background='#1a1a1a'">
+                        ◀
+                    </button>
 
-                <div id="thumbPagination" style="margin-top:0.5rem;">
-                    <button id="prevThumbs" style="padding:0.3rem 0.6rem; margin-right:0.3rem;">◀</button>
-                    <button id="nextThumbs" style="padding:0.3rem 0.6rem;">▶</button>
-                </div>
+                    <button id="nextThumbs"
+                        style="
+                                padding:0.4rem 0.9rem;
+                                background:#1a1a1a;
+                                color:#fff;
+                                border:none;
+                                border-radius:6px;
+                                font-size:1rem;
+                                cursor:pointer;
+                                box-shadow:0 2px 6px rgba(0,0,0,0.2);
+                                transition:0.2s;
+                            "
+                        onmouseover="this.style.background='#000'"
+                        onmouseout="this.style.background='#1a1a1a'">
+                        ▶
+                    </button>
             </aside>
-
         </div>
     </section>
 

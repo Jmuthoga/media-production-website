@@ -163,22 +163,13 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('admin/photography/portrait/{portrait}', [AdminPhotographyController::class, 'portraitDestroy'])->name('admin.photography.portrait.destroy');
 
     // === PORTRAIT GALLERY MANAGEMENT ===
-    Route::get(
-        'admin/photography/portrait/{portrait}/gallery',
-        [AdminPhotographyController::class, 'portraitGallery']
-    )
+    Route::get('admin/photography/portrait/{portrait}/gallery', [AdminPhotographyController::class, 'portraitGallery'])
         ->name('admin.photography.portrait.gallery');
 
-    Route::post(
-        'admin/photography/portrait/{portrait}/gallery',
-        [AdminPhotographyController::class, 'portraitGalleryStore']
-    )
+    Route::post('admin/photography/portrait/{portrait}/gallery', [AdminPhotographyController::class, 'portraitGalleryStore'])
         ->name('admin.photography.portrait.gallery.store');
 
-    Route::delete(
-        'admin/photography/portrait/{portrait}/gallery/{index}',
-        [AdminPhotographyController::class, 'portraitGalleryDestroy']
-    )
+    Route::delete('admin/photography/portrait/{portrait}/gallery/{index}', [AdminPhotographyController::class, 'portraitGalleryDestroy'])
         ->name('admin.photography.portrait.gallery.destroy');
 
 
@@ -189,6 +180,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/photography/family/{family}/edit', [AdminPhotographyController::class, 'familyEdit'])->name('admin.photography.family.edit');
     Route::put('admin/photography/family/{family}', [AdminPhotographyController::class, 'familyUpdate'])->name('admin.photography.family.update');
     Route::delete('admin/photography/family/{family}', [AdminPhotographyController::class, 'familyDestroy'])->name('admin.photography.family.destroy');
+
+    // === FAMILY GALLERY MANAGEMENT ===
+    Route::get('admin/photography/family/{family}/gallery', [AdminPhotographyController::class, 'familyGallery'])
+        ->name('admin.photography.family.gallery');
+
+    Route::post('admin/photography/family/{family}/gallery', [AdminPhotographyController::class, 'familyGalleryStore'])
+        ->name('admin.photography.family.gallery.store');
+
+    Route::delete('admin/photography/family/{family}/gallery/{index}', [AdminPhotographyController::class, 'familyGalleryDestroy'])
+        ->name('admin.photography.family.gallery.destroy');
 
 
     // === 3. STUDIO SESSION & HIRE ===

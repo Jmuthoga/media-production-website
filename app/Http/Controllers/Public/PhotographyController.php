@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\PortraitPhotography;
+use App\Models\FamilyPhotography;
 
 class PhotographyController extends Controller
 {
@@ -19,8 +20,14 @@ class PhotographyController extends Controller
 
     public function family()
     {
-        return view('public.photography.family');
+        $family = FamilyPhotography::first();
+
+        // Use backend gallery if exists, else empty array
+        $gallery = $family && !empty($family->gallery) ? $family->gallery : [];
+
+        return view('public.photography.family', compact('family', 'gallery'));
     }
+
     public function studio()
     {
         return view('public.photography.studio');

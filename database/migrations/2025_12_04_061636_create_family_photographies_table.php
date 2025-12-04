@@ -8,22 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('portrait_photographies', function (Blueprint $table) {
+        Schema::create('family_photographies', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
             $table->text('description')->nullable();
             $table->string('hero_image')->nullable();
             $table->string('hero_right_image')->nullable();
             $table->json('gallery')->nullable(); // store gallery images as JSON array
-            $table->string('cta_title')->nullable();
-            $table->text('cta_description')->nullable();
-
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('portrait_photographies');
+        Schema::dropIfExists('family_photographies');
     }
 };
