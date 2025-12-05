@@ -7,6 +7,7 @@ use App\Models\PortraitPhotography;
 use App\Models\FamilyPhotography;
 use App\Models\StudioSessionHire;
 use App\Models\WeddingsEngagements;
+use App\Models\PartiesConcerts;
 
 class PhotographyController extends Controller
 {
@@ -39,7 +40,9 @@ class PhotographyController extends Controller
     }
     public function parties()
     {
-        return view('public.photography.parties');
+        $party = PartiesConcerts::first();
+        $gallery = collect($party->gallery ?? []);
+        return view('public.photography.parties', compact('party', 'gallery'));
     }
     public function graduation()
     {

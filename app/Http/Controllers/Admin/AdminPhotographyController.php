@@ -613,6 +613,7 @@ class AdminPhotographyController extends Controller
 
 
     // === 5. PARTIES & CONCERTS ===
+
     public function partiesIndex()
     {
         $parties = PartiesConcerts::all();
@@ -626,9 +627,27 @@ class AdminPhotographyController extends Controller
 
     public function partiesStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        PartiesConcerts::create($request->all());
-        return redirect()->route('admin.photography.parties.index')->with('success', 'Parties & concerts added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('parties', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('parties', 'public');
+        }
+
+        PartiesConcerts::create($data);
+
+        return redirect()->route('admin.photography.parties.index')
+            ->with('success', 'Parties & concerts added successfully.');
     }
 
     public function partiesEdit(PartiesConcerts $party)
@@ -638,17 +657,102 @@ class AdminPhotographyController extends Controller
 
     public function partiesUpdate(Request $request, PartiesConcerts $party)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $party->update($request->all());
-        return redirect()->route('admin.photography.parties.index')->with('success', 'Parties & concerts updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('parties', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('parties', 'public');
+        }
+
+        $party->update($data);
+
+        return redirect()->route('admin.photography.parties.index')
+            ->with('success', 'Parties & concerts updated successfully.');
     }
 
     public function partiesDestroy(PartiesConcerts $party)
     {
+        if ($party->hero_image) {
+            \Storage::disk('public')->delete($party->hero_image);
+        }
+        if ($party->hero_right_image) {
+            \Storage::disk('public')->delete($party->hero_right_image);
+        }
+        if ($party->gallery) {
+            foreach ($party->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $party->delete();
-        return redirect()->route('admin.photography.parties.index')->with('success', 'Parties & concerts deleted successfully.');
+
+        return redirect()->route('admin.photography.parties.index')
+            ->with('success', 'Parties & concerts deleted successfully.');
     }
 
+    // === PARTIES GALLERY MANAGEMENT ===
+
+    public function partiesGallery($partyId)
+    {
+        $party = null;
+        if ($partyId != 0) {
+            $party = PartiesConcerts::findOrFail($partyId);
+        }
+
+        return view('admin.photography.parties.gallery', compact('party'));
+    }
+
+    public function partiesGalleryStore(Request $request, $partyId)
+    {
+        if ($partyId == 0) {
+            return redirect()->back()->with('error', 'Please select a party entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $party = PartiesConcerts::findOrFail($partyId);
+
+        $gallery = $party->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('parties/gallery', 'public');
+            }
+        }
+
+        $party->gallery = $gallery;
+        $party->save();
+
+        return redirect()->route('admin.photography.parties.gallery', $party)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function partiesGalleryDestroy(PartiesConcerts $party, $index)
+    {
+        $gallery = $party->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $party->gallery = $gallery;
+            $party->save();
+        }
+
+        return redirect()->route('admin.photography.parties.gallery', $party)
+            ->with('success', 'Gallery image deleted successfully.');
+    }
 
 
     // === 6. GRADUATION PHOTOGRAPHY ===
