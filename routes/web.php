@@ -219,6 +219,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('admin/photography/weddings/{wedding}', [AdminPhotographyController::class, 'weddingsUpdate'])->name('admin.photography.weddings.update');
     Route::delete('admin/photography/weddings/{wedding}', [AdminPhotographyController::class, 'weddingsDestroy'])->name('admin.photography.weddings.destroy');
 
+    // === WEDDINGS GALLERY MANAGEMENT ===
+    Route::get('admin/photography/weddings/{wedding}/gallery', [AdminPhotographyController::class, 'weddingsGallery'])
+        ->name('admin.photography.weddings.gallery');
+
+    Route::post('admin/photography/weddings/{wedding}/gallery', [AdminPhotographyController::class, 'weddingsGalleryStore'])
+        ->name('admin.photography.weddings.gallery.store');
+
+    Route::delete('admin/photography/weddings/{wedding}/gallery/{index}', [AdminPhotographyController::class, 'weddingsGalleryDestroy'])
+        ->name('admin.photography.weddings.gallery.destroy');
+
 
     // === 5. PARTIES & CONCERTS ===
     Route::get('admin/photography/parties', [AdminPhotographyController::class, 'partiesIndex'])->name('admin.photography.parties.index');

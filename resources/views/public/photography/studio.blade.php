@@ -167,85 +167,56 @@ $ctaDescription = ($studio && !empty($studio->cta_description))
     <!-- ============= STUDIO GALLERY SLIDER ============= -->
     <section aria-label="Studio Gallery" style="margin-top: 5rem;">
         <div class="slider" id="studioSlider" style="max-width:1200px; margin:0 auto;">
-            <div class="slider-main" id="sliderMain" style="position:relative; height:80vh; overflow:hidden; background:#fff;">
 
-                <!-- Slides -->
-                @foreach($galleryImages as $index => $img)
+            <!-- Main Slider -->
+            <div class="slider-main" id="sliderMain" style="position:relative; height:80vh; overflow:hidden; background:#fff;">
+                @foreach($gallery as $index => $img)
                 <div class="slide"
                     data-index="{{ $index }}"
                     tabindex="{{ $index === 0 ? '0' : '-1' }}"
                     aria-hidden="{{ $index === 0 ? 'false' : 'true' }}"
                     style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:{{ $index === 0 ? '1' : '0' }}; transition:opacity 0.4s; text-align:center; background:#fff;">
-                    <img src="{{ $img['src'] }}"
-                        alt="{{ $img['title'] ?? '' }}"
+
+                    <img src="{{ asset('storage/'.$img) }}"
+                        alt=""
                         loading="lazy"
                         class="zoomable"
                         style="width:auto; max-width:90%; max-height:80vh; object-fit:contain; display:inline-block; margin:0 auto; transition: transform 0.2s; cursor:grab;">
-                    <div class="caption" style="margin-top:1rem; text-align:center;">
-                        <h4 style="margin:0 0 0.5rem 0;">{{ $img['title'] ?? '' }}</h4>
-                        <p style="margin:0; color:#555;">{{ $img['description'] ?? '' }}</p>
-                    </div>
                 </div>
                 @endforeach
 
-                <!-- Slider controls -->
+                <!-- Slider Controls -->
                 <div class="slider-controls" style="position:absolute; top:50%; left:0; right:0; display:flex; justify-content:space-between; transform:translateY(-50%);">
                     <button id="prevBtn" style="background:#fff; border:none; padding:0.5rem 1rem; cursor:pointer; border-radius:5px;">◀</button>
                     <button id="nextBtn" style="background:#fff; border:none; padding:0.5rem 1rem; cursor:pointer; border-radius:5px;">▶</button>
                 </div>
 
-                <!-- Zoom controls -->
+                <!-- Zoom Controls -->
                 <div class="zoom-controls" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:0.5rem;">
                     <button id="zoomIn" style="background:#fff; border:none; padding:0.3rem 0.6rem; cursor:pointer; border-radius:5px;">Zoom +</button>
                     <button id="zoomOut" style="background:#fff; border:none; padding:0.3rem 0.6rem; cursor:pointer; border-radius:5px;">Zoom -</button>
                 </div>
-
-                <!-- Autoplay indicator -->
-                <div class="autoplay-indicator" style="position:absolute; bottom:10px; right:10px; background:rgba(255,255,255,0.8); padding:0.2rem 0.5rem; border-radius:5px; font-size:0.9rem;">Auto • On</div>
             </div>
 
-            <!-- Thumbnails with pagination -->
+            <!-- Thumbnails -->
             <aside class="slider-thumbs" style="display:flex; flex-direction:column; align-items:center; margin-top:1rem;">
-                <div id="thumbsContainer" style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;"></div>
-                <div id="thumbPagination" style="margin-top:0.5rem; display:flex; gap:0.5rem; justify-content:center;">
-                    <button id="prevThumbs"
-                        style="
-                        padding:0.4rem 0.9rem;
-                        background:#1a1a1a;
-                        color:#fff;
-                        border:none;
-                        border-radius:6px;
-                        font-size:1rem;
-                        cursor:pointer;
-                        box-shadow:0 2px 6px rgba(0,0,0,0.2);
-                        transition:0.2s;
-                    "
-                        onmouseover="this.style.background='#000'"
-                        onmouseout="this.style.background='#1a1a1a'">
-                        ◀
-                    </button>
+                <div id="thumbsContainer" style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;">
+                    @foreach($gallery->forPage(request('page', 1), 5) as $index => $img)
+                    <div class="thumb" data-index="{{ $index }}" style="width:120px; height:80px; overflow:hidden; border-radius:8px; cursor:pointer;">
+                        <img src="{{ asset('storage/'.$img) }}" alt="" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;">
+                    </div>
+                    @endforeach
+                </div>
 
-                    <button id="nextThumbs"
-                        style="
-                        padding:0.4rem 0.9rem;
-                        background:#1a1a1a;
-                        color:#fff;
-                        border:none;
-                        border-radius:6px;
-                        font-size:1rem;
-                        cursor:pointer;
-                        box-shadow:0 2px 6px rgba(0,0,0,0.2);
-                        transition:0.2s;
-                    "
-                        onmouseover="this.style.background='#000'"
-                        onmouseout="this.style.background='#1a1a1a'">
-                        ▶
-                    </button>
+                <!-- Thumbnail Pagination -->
+                <div id="thumbPagination" style="margin-top:0.5rem; display:flex; gap:0.5rem; justify-content:center;">
+                    <button id="prevThumbs">◀</button>
+                    <button id="nextThumbs">▶</button>
                 </div>
             </aside>
-
         </div>
     </section>
+
 
     <!-- ===== SERVICES ===== -->
     <section class="services-grid">

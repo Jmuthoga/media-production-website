@@ -6,41 +6,36 @@ use App\Http\Controllers\Controller;
 use App\Models\PortraitPhotography;
 use App\Models\FamilyPhotography;
 use App\Models\StudioSessionHire;
+use App\Models\WeddingsEngagements;
 
 class PhotographyController extends Controller
 {
     public function portrait()
     {
         $portrait = PortraitPhotography::first();
-
-        // Use backend gallery if exists, else empty array
-        $gallery = $portrait && !empty($portrait->gallery) ? $portrait->gallery : [];
-
+        $gallery = collect($portrait->gallery ?? []);
         return view('public.photography.portrait', compact('portrait', 'gallery'));
     }
 
     public function family()
     {
         $family = FamilyPhotography::first();
-
-        // Use backend gallery if exists, else empty array
-        $gallery = $family && !empty($family->gallery) ? $family->gallery : [];
-
+        $gallery = collect($family->gallery ?? []);
         return view('public.photography.family', compact('family', 'gallery'));
     }
 
     public function studio()
     {
         $studio = StudioSessionHire::first();
-
-        // Use backend gallery if exists, else empty array
-        $gallery = $studio && !empty($studio->gallery) ? $studio->gallery : [];
-
+        $gallery = collect($studio->gallery ?? []);
         return view('public.photography.studio', compact('studio', 'gallery'));
     }
+
     public function weddings()
     {
-        return view('public.photography.weddings');
+        $wedding = WeddingsEngagements::first();
+        $gallery = collect($wedding->gallery ?? []);
+        return view('public.photography.weddings', compact('wedding', 'gallery'));
     }
     public function parties()
     {

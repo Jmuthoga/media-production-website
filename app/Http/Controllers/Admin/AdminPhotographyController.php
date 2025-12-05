@@ -468,6 +468,7 @@ class AdminPhotographyController extends Controller
 
 
     // === 4. WEDDINGS & ENGAGEMENTS ===
+
     public function weddingsIndex()
     {
         $weddings = WeddingsEngagements::all();
@@ -481,9 +482,27 @@ class AdminPhotographyController extends Controller
 
     public function weddingsStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        WeddingsEngagements::create($request->all());
-        return redirect()->route('admin.photography.weddings.index')->with('success', 'Weddings & engagements added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120', // 5MB max
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('weddings', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('weddings', 'public');
+        }
+
+        WeddingsEngagements::create($data);
+
+        return redirect()->route('admin.photography.weddings.index')
+            ->with('success', 'Weddings & engagements added successfully.');
     }
 
     public function weddingsEdit(WeddingsEngagements $wedding)
@@ -493,17 +512,104 @@ class AdminPhotographyController extends Controller
 
     public function weddingsUpdate(Request $request, WeddingsEngagements $wedding)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $wedding->update($request->all());
-        return redirect()->route('admin.photography.weddings.index')->with('success', 'Weddings & engagements updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('weddings', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('weddings', 'public');
+        }
+
+        $wedding->update($data);
+
+        return redirect()->route('admin.photography.weddings.index')
+            ->with('success', 'Weddings & engagements updated successfully.');
     }
 
     public function weddingsDestroy(WeddingsEngagements $wedding)
     {
+        if ($wedding->hero_image) {
+            \Storage::disk('public')->delete($wedding->hero_image);
+        }
+
+        if ($wedding->hero_right_image) {
+            \Storage::disk('public')->delete($wedding->hero_right_image);
+        }
+
+        if ($wedding->gallery) {
+            foreach ($wedding->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $wedding->delete();
-        return redirect()->route('admin.photography.weddings.index')->with('success', 'Weddings & engagements deleted successfully.');
+
+        return redirect()->route('admin.photography.weddings.index')
+            ->with('success', 'Weddings & engagements deleted successfully.');
     }
 
+    // === WEDDINGS GALLERY MANAGEMENT ===
+
+    public function weddingsGallery($weddingId)
+    {
+        $wedding = null;
+        if ($weddingId != 0) {
+            $wedding = WeddingsEngagements::findOrFail($weddingId);
+        }
+
+        return view('admin.photography.weddings.gallery', compact('wedding'));
+    }
+
+    public function weddingsGalleryStore(Request $request, $weddingId)
+    {
+        if ($weddingId == 0) {
+            return redirect()->back()->with('error', 'Please select a wedding entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $wedding = WeddingsEngagements::findOrFail($weddingId);
+
+        $gallery = $wedding->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('weddings/gallery', 'public');
+            }
+        }
+
+        $wedding->gallery = $gallery;
+        $wedding->save();
+
+        return redirect()->route('admin.photography.weddings.gallery', $wedding)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function weddingsGalleryDestroy(WeddingsEngagements $wedding, $index)
+    {
+        $gallery = $wedding->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $wedding->gallery = $gallery;
+            $wedding->save();
+        }
+
+        return redirect()->route('admin.photography.weddings.gallery', $wedding)
+            ->with('success', 'Gallery image deleted successfully.');
+    }
 
 
     // === 5. PARTIES & CONCERTS ===
