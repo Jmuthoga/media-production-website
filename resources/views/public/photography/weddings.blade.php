@@ -154,9 +154,23 @@ $ctaDescription = ($wedding && !empty($wedding->cta_description)) ? $wedding->ct
                 @endforeach
 
                 <!-- Slider controls -->
-                <div class="slider-controls" style="position:absolute; top:50%; left:0; right:0; display:flex; justify-content:space-between; transform:translateY(-50%);">
-                    <button id="prevBtn" style="background:#fff; border:none; padding:0.5rem 1rem; cursor:pointer; border-radius:5px;">◀</button>
-                    <button id="nextBtn" style="background:#fff; border:none; padding:0.5rem 1rem; cursor:pointer; border-radius:5px;">▶</button>
+                <div class="slider-controls"
+                    style="position:absolute; top:50%; left:0; right:0; display:flex; justify-content:space-between; transform:translateY(-50%);">
+
+                    <button id="prevBtn"
+                        style="background:black; color:white; border:none; width:45px; height:45px; border-radius:50%; 
+               font-size:20px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+               box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+                        ◀
+                    </button>
+
+                    <button id="nextBtn"
+                        style="background:black; color:white; border:none; width:45px; height:45px; border-radius:50%; 
+               font-size:20px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+               box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+                        ▶
+                    </button>
+
                 </div>
 
                 <!-- Zoom controls -->
