@@ -275,6 +275,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('admin/photography/corporate/{corporate}', [AdminPhotographyController::class, 'corporateUpdate'])->name('admin.photography.corporate.update');
     Route::delete('admin/photography/corporate/{corporate}', [AdminPhotographyController::class, 'corporateDestroy'])->name('admin.photography.corporate.destroy');
 
+    // === CORPORATE GALLERY MANAGEMENT ===
+    Route::get('admin/photography/corporate/{corporate}/gallery', [AdminPhotographyController::class, 'corporateGallery'])
+        ->name('admin.photography.corporate.gallery');
+
+    Route::post('admin/photography/corporate/{corporate}/gallery', [AdminPhotographyController::class, 'corporateGalleryStore'])
+        ->name('admin.photography.corporate.gallery.store');
+
+    Route::delete('admin/photography/corporate/{corporate}/gallery/{index}', [AdminPhotographyController::class, 'corporateGalleryDestroy'])
+        ->name('admin.photography.corporate.gallery.destroy');
+
 
     // === 8. SCHOOL & INSTITUTION PHOTOGRAPHY ===
     Route::get('admin/photography/school', [AdminPhotographyController::class, 'schoolIndex'])->name('admin.photography.school.index');
@@ -283,6 +293,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/photography/school/{school}/edit', [AdminPhotographyController::class, 'schoolEdit'])->name('admin.photography.school.edit');
     Route::put('admin/photography/school/{school}', [AdminPhotographyController::class, 'schoolUpdate'])->name('admin.photography.school.update');
     Route::delete('admin/photography/school/{school}', [AdminPhotographyController::class, 'schoolDestroy'])->name('admin.photography.school.destroy');
+
+    // === SCHOOL GALLERY MANAGEMENT ===
+    Route::get('admin/photography/school/{school}/gallery', [AdminPhotographyController::class, 'schoolGallery'])
+        ->name('admin.photography.school.gallery');
+    Route::post('admin/photography/school/{school}/gallery', [AdminPhotographyController::class, 'schoolGalleryStore'])
+        ->name('admin.photography.school.gallery.store');
+    Route::delete('admin/photography/school/{school}/gallery/{index}', [AdminPhotographyController::class, 'schoolGalleryDestroy'])
+        ->name('admin.photography.school.gallery.destroy');
 
 
     // === 9. PRODUCT PHOTOGRAPHY ===
@@ -293,6 +311,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('admin/photography/product/{product}', [AdminPhotographyController::class, 'productUpdate'])->name('admin.photography.product.update');
     Route::delete('admin/photography/product/{product}', [AdminPhotographyController::class, 'productDestroy'])->name('admin.photography.product.destroy');
 
+    // === PRODUCT GALLERY MANAGEMENT ===
+    Route::get('admin/photography/product/{product}/gallery', [AdminPhotographyController::class, 'productGallery'])
+        ->name('admin.photography.product.gallery');
+    Route::post('admin/photography/product/{product}/gallery', [AdminPhotographyController::class, 'productGalleryStore'])
+        ->name('admin.photography.product.gallery.store');
+    Route::delete('admin/photography/product/{product}/gallery/{index}', [AdminPhotographyController::class, 'productGalleryDestroy'])
+        ->name('admin.photography.product.gallery.destroy');
+
 
     // === 10. OUTDOOR & NATURE SHOOTS ===
     Route::get('admin/photography/outdoor', [AdminPhotographyController::class, 'outdoorIndex'])->name('admin.photography.outdoor.index');
@@ -301,6 +327,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('admin/photography/outdoor/{outdoor}/edit', [AdminPhotographyController::class, 'outdoorEdit'])->name('admin.photography.outdoor.edit');
     Route::put('admin/photography/outdoor/{outdoor}', [AdminPhotographyController::class, 'outdoorUpdate'])->name('admin.photography.outdoor.update');
     Route::delete('admin/photography/outdoor/{outdoor}', [AdminPhotographyController::class, 'outdoorDestroy'])->name('admin.photography.outdoor.destroy');
+
+    // === OUTDOOR GALLERY MANAGEMENT ===
+    Route::get('admin/photography/outdoor/{outdoor}/gallery', [AdminPhotographyController::class, 'outdoorGallery'])
+        ->name('admin.photography.outdoor.gallery');
+    Route::post('admin/photography/outdoor/{outdoor}/gallery', [AdminPhotographyController::class, 'outdoorGalleryStore'])
+        ->name('admin.photography.outdoor.gallery.store');
+    Route::delete('admin/photography/outdoor/{outdoor}/gallery/{index}', [AdminPhotographyController::class, 'outdoorGalleryDestroy'])
+        ->name('admin.photography.outdoor.gallery.destroy');
 
 
     // === 11. TIKTOK & SCHOOL MEDIA SHOOTS ===

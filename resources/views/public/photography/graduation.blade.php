@@ -77,7 +77,7 @@ $ctaDescription = ($graduation && !empty($graduation->cta_description)) ? $gradu
             </div>
         </div>
         <div class="hero-right" style="flex:1; max-width:600px; height:75vh; overflow:hidden; display:flex; align-items:flex-start;">
-            <img src="{{ $heroRight }}" alt="Studio setup" loading="lazy"
+            <img src="{{ $heroRight }}" alt="Graduation" loading="lazy"
                 style="width:100%; height:100%; object-fit:cover; object-position:top;">
         </div>
     </div>

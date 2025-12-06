@@ -9,6 +9,10 @@ use App\Models\StudioSessionHire;
 use App\Models\WeddingsEngagements;
 use App\Models\PartiesConcerts;
 use App\Models\GraduationPhotography;
+use App\Models\CorporateEventCoverage;
+use App\Models\SchoolInstitutionPhotography;
+use App\Models\ProductPhotography;
+use App\Models\OutdoorNatureShoots;
 
 class PhotographyController extends Controller
 {
@@ -53,19 +57,27 @@ class PhotographyController extends Controller
     }
     public function corporate()
     {
-        return view('public.photography.corporate');
+        $corporate = CorporateEventCoverage::first();
+        $gallery = collect($corporate->gallery ?? []);
+        return view('public.photography.corporate', compact('corporate', 'gallery'));
     }
     public function school()
     {
-        return view('public.photography.school');
+        $school = SchoolInstitutionPhotography::first();
+        $gallery = collect($school->gallery ?? []);
+        return view('public.photography.school', compact('school', 'gallery'));
     }
     public function product()
     {
-        return view('public.photography.product');
+        $product = ProductPhotography::first();
+        $gallery = collect($product->gallery ?? []);
+        return view('public.photography.product', compact('product', 'gallery'));
     }
     public function outdoor()
     {
-        return view('public.photography.outdoor');
+        $outdoor = OutdoorNatureShoots::first();
+        $gallery = collect($outdoor->gallery ?? []);
+        return view('public.photography.outdoor', compact('outdoor', 'gallery'));
     }
     public function social()
     {

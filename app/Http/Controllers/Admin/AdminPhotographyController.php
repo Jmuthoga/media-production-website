@@ -902,7 +902,8 @@ class AdminPhotographyController extends Controller
 
 
 
-    // === 7. CORPORATE & EVENT COVERAGE ===
+    // === 6. CORPORATE EVENT COVERAGE ===
+
     public function corporateIndex()
     {
         $corporates = CorporateEventCoverage::all();
@@ -916,9 +917,27 @@ class AdminPhotographyController extends Controller
 
     public function corporateStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        CorporateEventCoverage::create($request->all());
-        return redirect()->route('admin.photography.corporate.index')->with('success', 'Corporate & event coverage added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('corporate', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('corporate', 'public');
+        }
+
+        CorporateEventCoverage::create($data);
+
+        return redirect()->route('admin.photography.corporate.index')
+            ->with('success', 'Corporate event coverage added successfully.');
     }
 
     public function corporateEdit(CorporateEventCoverage $corporate)
@@ -928,20 +947,109 @@ class AdminPhotographyController extends Controller
 
     public function corporateUpdate(Request $request, CorporateEventCoverage $corporate)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $corporate->update($request->all());
-        return redirect()->route('admin.photography.corporate.index')->with('success', 'Corporate & event coverage updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('corporate', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('corporate', 'public');
+        }
+
+        $corporate->update($data);
+
+        return redirect()->route('admin.photography.corporate.index')
+            ->with('success', 'Corporate event coverage updated successfully.');
     }
 
     public function corporateDestroy(CorporateEventCoverage $corporate)
     {
+        if ($corporate->hero_image) {
+            \Storage::disk('public')->delete($corporate->hero_image);
+        }
+
+        if ($corporate->hero_right_image) {
+            \Storage::disk('public')->delete($corporate->hero_right_image);
+        }
+
+        if ($corporate->gallery) {
+            foreach ($corporate->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $corporate->delete();
-        return redirect()->route('admin.photography.corporate.index')->with('success', 'Corporate & event coverage deleted successfully.');
+
+        return redirect()->route('admin.photography.corporate.index')
+            ->with('success', 'Corporate event coverage deleted successfully.');
     }
 
 
+    // === CORPORATE GALLERY MANAGEMENT ===
+
+    public function corporateGallery($corporateId)
+    {
+        $corporate = null;
+        if ($corporateId != 0) {
+            $corporate = CorporateEventCoverage::findOrFail($corporateId);
+        }
+
+        return view('admin.photography.corporate.gallery', compact('corporate'));
+    }
+
+    public function corporateGalleryStore(Request $request, $corporateId)
+    {
+        if ($corporateId == 0) {
+            return redirect()->back()->with('error', 'Please select a corporate entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $corporate = CorporateEventCoverage::findOrFail($corporateId);
+
+        $gallery = $corporate->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('corporate/gallery', 'public');
+            }
+        }
+
+        $corporate->gallery = $gallery;
+        $corporate->save();
+
+        return redirect()->route('admin.photography.corporate.gallery', $corporate)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function corporateGalleryDestroy(CorporateEventCoverage $corporate, $index)
+    {
+        $gallery = $corporate->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $corporate->gallery = $gallery;
+            $corporate->save();
+        }
+
+        return redirect()->route('admin.photography.corporate.gallery', $corporate)
+            ->with('success', 'Gallery image deleted successfully.');
+    }
+
 
     // === 8. SCHOOL & INSTITUTION PHOTOGRAPHY ===
+
     public function schoolIndex()
     {
         $schools = SchoolInstitutionPhotography::all();
@@ -955,9 +1063,27 @@ class AdminPhotographyController extends Controller
 
     public function schoolStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        SchoolInstitutionPhotography::create($request->all());
-        return redirect()->route('admin.photography.school.index')->with('success', 'School photography added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('school', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('school', 'public');
+        }
+
+        SchoolInstitutionPhotography::create($data);
+
+        return redirect()->route('admin.photography.school.index')
+            ->with('success', 'School & institution photography added successfully.');
     }
 
     public function schoolEdit(SchoolInstitutionPhotography $school)
@@ -967,15 +1093,102 @@ class AdminPhotographyController extends Controller
 
     public function schoolUpdate(Request $request, SchoolInstitutionPhotography $school)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $school->update($request->all());
-        return redirect()->route('admin.photography.school.index')->with('success', 'School photography updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('school', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('school', 'public');
+        }
+
+        $school->update($data);
+
+        return redirect()->route('admin.photography.school.index')
+            ->with('success', 'School & institution photography updated successfully.');
     }
 
     public function schoolDestroy(SchoolInstitutionPhotography $school)
     {
+        if ($school->hero_image) {
+            \Storage::disk('public')->delete($school->hero_image);
+        }
+
+        if ($school->hero_right_image) {
+            \Storage::disk('public')->delete($school->hero_right_image);
+        }
+
+        if ($school->gallery) {
+            foreach ($school->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $school->delete();
-        return redirect()->route('admin.photography.school.index')->with('success', 'School photography deleted successfully.');
+
+        return redirect()->route('admin.photography.school.index')
+            ->with('success', 'School & institution photography deleted successfully.');
+    }
+
+    // === SCHOOL GALLERY MANAGEMENT ===
+
+    public function schoolGallery($schoolId)
+    {
+        $school = null;
+        if ($schoolId != 0) {
+            $school = SchoolInstitutionPhotography::findOrFail($schoolId);
+        }
+
+        return view('admin.photography.school.gallery', compact('school'));
+    }
+
+    public function schoolGalleryStore(Request $request, $schoolId)
+    {
+        if ($schoolId == 0) {
+            return redirect()->back()->with('error', 'Please select a school entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $school = SchoolInstitutionPhotography::findOrFail($schoolId);
+        $gallery = $school->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('school/gallery', 'public');
+            }
+        }
+
+        $school->gallery = $gallery;
+        $school->save();
+
+        return redirect()->route('admin.photography.school.gallery', $school)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function schoolGalleryDestroy(SchoolInstitutionPhotography $school, $index)
+    {
+        $gallery = $school->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $school->gallery = $gallery;
+            $school->save();
+        }
+
+        return redirect()->route('admin.photography.school.gallery', $school)
+            ->with('success', 'Gallery image deleted successfully.');
     }
 
 
@@ -994,9 +1207,27 @@ class AdminPhotographyController extends Controller
 
     public function productStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        ProductPhotography::create($request->all());
-        return redirect()->route('admin.photography.product.index')->with('success', 'Product photography added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('product', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('product', 'public');
+        }
+
+        ProductPhotography::create($data);
+
+        return redirect()->route('admin.photography.product.index')
+            ->with('success', 'Product photography added successfully.');
     }
 
     public function productEdit(ProductPhotography $product)
@@ -1006,20 +1237,109 @@ class AdminPhotographyController extends Controller
 
     public function productUpdate(Request $request, ProductPhotography $product)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $product->update($request->all());
-        return redirect()->route('admin.photography.product.index')->with('success', 'Product photography updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('product', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('product', 'public');
+        }
+
+        $product->update($data);
+
+        return redirect()->route('admin.photography.product.index')
+            ->with('success', 'Product photography updated successfully.');
     }
 
     public function productDestroy(ProductPhotography $product)
     {
+        if ($product->hero_image) {
+            \Storage::disk('public')->delete($product->hero_image);
+        }
+
+        if ($product->hero_right_image) {
+            \Storage::disk('public')->delete($product->hero_right_image);
+        }
+
+        if ($product->gallery) {
+            foreach ($product->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $product->delete();
-        return redirect()->route('admin.photography.product.index')->with('success', 'Product photography deleted successfully.');
+
+        return redirect()->route('admin.photography.product.index')
+            ->with('success', 'Product photography deleted successfully.');
+    }
+
+    // === PRODUCT GALLERY MANAGEMENT ===
+
+    public function productGallery($productId)
+    {
+        $product = null;
+        if ($productId != 0) {
+            $product = ProductPhotography::findOrFail($productId);
+        }
+
+        return view('admin.photography.product.gallery', compact('product'));
+    }
+
+    public function productGalleryStore(Request $request, $productId)
+    {
+        if ($productId == 0) {
+            return redirect()->back()->with('error', 'Please select a product entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $product = ProductPhotography::findOrFail($productId);
+        $gallery = $product->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('product/gallery', 'public');
+            }
+        }
+
+        $product->gallery = $gallery;
+        $product->save();
+
+        return redirect()->route('admin.photography.product.gallery', $product)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function productGalleryDestroy(ProductPhotography $product, $index)
+    {
+        $gallery = $product->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $product->gallery = $gallery;
+            $product->save();
+        }
+
+        return redirect()->route('admin.photography.product.gallery', $product)
+            ->with('success', 'Gallery image deleted successfully.');
     }
 
 
 
+
     // === 10. OUTDOOR & NATURE SHOOTS ===
+
     public function outdoorIndex()
     {
         $outdoors = OutdoorNatureShoots::all();
@@ -1033,9 +1353,27 @@ class AdminPhotographyController extends Controller
 
     public function outdoorStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        OutdoorNatureShoots::create($request->all());
-        return redirect()->route('admin.photography.outdoor.index')->with('success', 'Outdoor & nature shoot added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('outdoor', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('outdoor', 'public');
+        }
+
+        OutdoorNatureShoots::create($data);
+
+        return redirect()->route('admin.photography.outdoor.index')
+            ->with('success', 'Outdoor & nature shoot added successfully.');
     }
 
     public function outdoorEdit(OutdoorNatureShoots $outdoor)
@@ -1045,17 +1383,106 @@ class AdminPhotographyController extends Controller
 
     public function outdoorUpdate(Request $request, OutdoorNatureShoots $outdoor)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $outdoor->update($request->all());
-        return redirect()->route('admin.photography.outdoor.index')->with('success', 'Outdoor & nature shoot updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('outdoor', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('outdoor', 'public');
+        }
+
+        $outdoor->update($data);
+
+        return redirect()->route('admin.photography.outdoor.index')
+            ->with('success', 'Outdoor & nature shoot updated successfully.');
     }
 
     public function outdoorDestroy(OutdoorNatureShoots $outdoor)
     {
+        if ($outdoor->hero_image) {
+            \Storage::disk('public')->delete($outdoor->hero_image);
+        }
+
+        if ($outdoor->hero_right_image) {
+            \Storage::disk('public')->delete($outdoor->hero_right_image);
+        }
+
+        if ($outdoor->gallery) {
+            foreach ($outdoor->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $outdoor->delete();
-        return redirect()->route('admin.photography.outdoor.index')->with('success', 'Outdoor & nature shoot deleted successfully.');
+
+        return redirect()->route('admin.photography.outdoor.index')
+            ->with('success', 'Outdoor & nature shoot deleted successfully.');
     }
 
+
+    // === OUTDOOR GALLERY MANAGEMENT ===
+
+    public function outdoorGallery($outdoorId)
+    {
+        $outdoor = null;
+
+        if ($outdoorId != 0) {
+            $outdoor = OutdoorNatureShoots::findOrFail($outdoorId);
+        }
+
+        return view('admin.photography.outdoor.gallery', compact('outdoor'));
+    }
+
+    public function outdoorGalleryStore(Request $request, $outdoorId)
+    {
+        if ($outdoorId == 0) {
+            return redirect()->back()->with('error', 'Please select an outdoor entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $outdoor = OutdoorNatureShoots::findOrFail($outdoorId);
+
+        $gallery = $outdoor->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('outdoor/gallery', 'public');
+            }
+        }
+
+        $outdoor->gallery = $gallery;
+        $outdoor->save();
+
+        return redirect()->route('admin.photography.outdoor.gallery', $outdoor)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function outdoorGalleryDestroy(OutdoorNatureShoots $outdoor, $index)
+    {
+        $gallery = $outdoor->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $outdoor->gallery = $gallery;
+            $outdoor->save();
+        }
+
+        return redirect()->route('admin.photography.outdoor.gallery', $outdoor)
+            ->with('success', 'Gallery image deleted successfully.');
+    }
 
 
     // === 11. TIKTOK & SCHOOL MEDIA SHOOTS ===
