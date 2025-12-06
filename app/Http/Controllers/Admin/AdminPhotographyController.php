@@ -756,6 +756,7 @@ class AdminPhotographyController extends Controller
 
 
     // === 6. GRADUATION PHOTOGRAPHY ===
+
     public function graduationIndex()
     {
         $graduations = GraduationPhotography::all();
@@ -769,9 +770,27 @@ class AdminPhotographyController extends Controller
 
     public function graduationStore(Request $request)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        GraduationPhotography::create($request->all());
-        return redirect()->route('admin.photography.graduation.index')->with('success', 'Graduation photography added successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('graduation', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('graduation', 'public');
+        }
+
+        GraduationPhotography::create($data);
+
+        return redirect()->route('admin.photography.graduation.index')
+            ->with('success', 'Graduation photography added successfully.');
     }
 
     public function graduationEdit(GraduationPhotography $graduation)
@@ -781,16 +800,105 @@ class AdminPhotographyController extends Controller
 
     public function graduationUpdate(Request $request, GraduationPhotography $graduation)
     {
-        $request->validate(['title' => 'required', 'content' => 'required']);
-        $graduation->update($request->all());
-        return redirect()->route('admin.photography.graduation.index')->with('success', 'Graduation photography updated successfully.');
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'hero_image' => 'nullable|image|max:5120',
+            'hero_right_image' => 'nullable|image|max:5120',
+        ]);
+
+        $data = $request->only(['title', 'description']);
+
+        if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $request->file('hero_image')->store('graduation', 'public');
+        }
+
+        if ($request->hasFile('hero_right_image')) {
+            $data['hero_right_image'] = $request->file('hero_right_image')->store('graduation', 'public');
+        }
+
+        $graduation->update($data);
+
+        return redirect()->route('admin.photography.graduation.index')
+            ->with('success', 'Graduation photography updated successfully.');
     }
 
     public function graduationDestroy(GraduationPhotography $graduation)
     {
+        if ($graduation->hero_image) {
+            \Storage::disk('public')->delete($graduation->hero_image);
+        }
+
+        if ($graduation->hero_right_image) {
+            \Storage::disk('public')->delete($graduation->hero_right_image);
+        }
+
+        if ($graduation->gallery) {
+            foreach ($graduation->gallery as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
         $graduation->delete();
-        return redirect()->route('admin.photography.graduation.index')->with('success', 'Graduation photography deleted successfully.');
+
+        return redirect()->route('admin.photography.graduation.index')
+            ->with('success', 'Graduation photography deleted successfully.');
     }
+
+    // === GRADUATION GALLERY MANAGEMENT ===
+
+    public function graduationGallery($graduationId)
+    {
+        $graduation = null;
+        if ($graduationId != 0) {
+            $graduation = GraduationPhotography::findOrFail($graduationId);
+        }
+
+        return view('admin.photography.graduation.gallery', compact('graduation'));
+    }
+
+    public function graduationGalleryStore(Request $request, $graduationId)
+    {
+        if ($graduationId == 0) {
+            return redirect()->back()->with('error', 'Please select a graduation entry to add gallery images.');
+        }
+
+        $request->validate([
+            'gallery.*' => 'required|image|max:5120',
+        ]);
+
+        $graduation = GraduationPhotography::findOrFail($graduationId);
+
+        $gallery = $graduation->gallery ?? [];
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('graduation/gallery', 'public');
+            }
+        }
+
+        $graduation->gallery = $gallery;
+        $graduation->save();
+
+        return redirect()->route('admin.photography.graduation.gallery', $graduation)
+            ->with('success', 'Gallery images added successfully.');
+    }
+
+    public function graduationGalleryDestroy(GraduationPhotography $graduation, $index)
+    {
+        $gallery = $graduation->gallery ?? [];
+
+        if (isset($gallery[$index])) {
+            \Storage::disk('public')->delete($gallery[$index]);
+            array_splice($gallery, $index, 1);
+            $graduation->gallery = $gallery;
+            $graduation->save();
+        }
+
+        return redirect()->route('admin.photography.graduation.gallery', $graduation)
+            ->with('success', 'Gallery image deleted successfully.');
+    }
+
 
 
 

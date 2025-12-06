@@ -256,6 +256,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('admin/photography/graduation/{graduation}', [AdminPhotographyController::class, 'graduationUpdate'])->name('admin.photography.graduation.update');
     Route::delete('admin/photography/graduation/{graduation}', [AdminPhotographyController::class, 'graduationDestroy'])->name('admin.photography.graduation.destroy');
 
+    // === GRADUATION GALLERY MANAGEMENT ===
+    Route::get('admin/photography/graduation/{graduation}/gallery', [AdminPhotographyController::class, 'graduationGallery'])
+        ->name('admin.photography.graduation.gallery');
+
+    Route::post('admin/photography/graduation/{graduation}/gallery', [AdminPhotographyController::class, 'graduationGalleryStore'])
+        ->name('admin.photography.graduation.gallery.store');
+
+    Route::delete('admin/photography/graduation/{graduation}/gallery/{index}', [AdminPhotographyController::class, 'graduationGalleryDestroy'])
+        ->name('admin.photography.graduation.gallery.destroy');
+
 
     // === 7. CORPORATE & EVENT COVERAGE ===
     Route::get('admin/photography/corporate', [AdminPhotographyController::class, 'corporateIndex'])->name('admin.photography.corporate.index');
